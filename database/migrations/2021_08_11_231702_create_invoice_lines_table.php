@@ -21,7 +21,7 @@ class CreateInvoiceLinesTable extends Migration
             $table->unsignedInteger('invoice_id');
             $table->unsignedInteger('product_id');
             // $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
-            // $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 

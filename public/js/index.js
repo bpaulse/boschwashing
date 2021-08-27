@@ -10,7 +10,6 @@ $(document).ready(function(){
 		if ( doAjax ) {
 
 			var form = this;
-			// var formData = new FormData(form);
 
 			$.ajax({
 				type: $(form).attr('method'),
@@ -33,7 +32,6 @@ $(document).ready(function(){
 						$(form)[0].reset();
 						toastr.success(response.msg);
 						//append to tableData
-						console.log('bev');
 						console.log(response.data);
 
 						var invoice = response.data;
@@ -56,24 +54,133 @@ $(document).ready(function(){
 
 	getInvoiceList();
 
-	$(document).on('click', '.saveInvoice', function(){
-		console.log('saveInvoice');
-		$.ajax({
-			url: '',
-			method: 'post'
-		});
-		$('#editInvoiceModal').modal('hide');
-	});
+	// $(document).on('click', '.saveInvoice', function(){
+	// 	console.log('saveInvoice');
+	// 	$.ajax({
+	// 		url: '',
+	// 		method: 'post'
+	// 	});
+	// 	$('#editInvoiceModal').modal('hide');
+	// });
 
 	$(document).on('click', '#add-invoice-line', function(e){
 		console.log('add-invoice-line');
+	});
 
+	$(document).on('click', '.update-productline', function(e){
 
+		const currency = 'R';
+
+		console.log('update-productline');
+		var quantity = $('#inputQuantity').val();
+		var product_id = $('#inputProduct').val();
+		var inv_line_id = $('#inv_line_id').val();
+
+		console.log(inv_line_id);
+
+		console.log(quantity, product_id);
+		console.log(parseFloat(quantity).toFixed(2));
+
+		var ajaxData = {
+			invoice_line_id: inv_line_id,
+			quantity: parseFloat(quantity).toFixed(2),
+			product_id: product_id
+		};
+
+		console.log(ajaxData);
+
+		$('#lineupdateform').hide();
+
+		$.ajax({
+			method: 'post',
+			url: '/updateInvoiceLine',
+			data: ajaxData,
+			headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+			success: function(response) {
+				console.log(response);
+
+				if ( response.code === 1 ) {
+					$('#lineupdateform').hide();
+					toastr.success(response.msg);
+
+					console.log(response.data.invoiceLine.product_id);
+					console.log(response.data.products);
+
+					var prodInfo = getProductInfo(response.data.products, response.data.invoiceLine.product_id);
+
+					console.log('prodInfo');
+					console.log(prodInfo);
+
+					$('#' + inv_line_id + ' td:nth-child(1)').text(prodInfo.product_name);
+					$('#' + inv_line_id + ' td:nth-child(2)').text(ajaxData.quantity);
+					$('#' + inv_line_id + ' td:nth-child(3)').text(currency + ' ' + prodInfo.unitprice);
+
+					var totalPrice = parseFloat(ajaxData.quantity) * parseFloat(prodInfo.unitprice);
+
+					// n = 10000;
+					// r = n.toFixed(2); //10000.00
+					// addCommas(r); // 10,000.00
+
+					$('#' + inv_line_id + ' td:nth-child(4)').text(currency + ' ' + addCommas(totalPrice.toFixed(2)));
+
+					$('.invoiceTotal').text();
+
+				} else {
+					toastr.warning(response.msg);
+				}
+
+			},
+			error: function(e) {
+				console.log(e);
+			}
+		});
 
 	});
 
 	$('#add-invoice-line').hover(function() {
 		$(this).css('cursor','pointer');
+	});
+
+	$(document).on('hover', '.delete-invoiceline', function(){
+		$(this).css('cursor','pointer');
+	});
+
+
+	$(document).on('click', '.delete-invoiceline', function(){
+		var trid = $(this).closest('tr').attr('id');
+		console.log('delete');
+		console.log(trid);
+	});
+
+	$(document).on('click', '.edit-invoiceline', function(){
+	
+		var trid = $(this).closest('tr').attr('id');
+		// console.log('edit');
+		// console.log(trid);
+		$('#lineupdateform').show();
+
+		//populate amount
+		$.ajax({
+			method: 'get',
+			url: '/getInvoiceLineInfo',
+			data: {inv_line_id: trid},
+			dataType: 'json',
+			contentType: false,
+			success: function(data){
+				// console.log(data.invoicelineInfo);
+				populateProductSelect(data.products);
+				$('#inputQuantity').val(parseFloat(data.invoicelineInfo.quantity).toFixed(2));
+				$("#inputProduct").val(data.invoicelineInfo.product_id);
+				// console.log('trid');
+				// console.log(trid);
+				$("#inv_line_id").val(trid);
+			},
+			error: function(xhr, ajaxOptions, thrownError){
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+
 	});
 
 	$(document).on('click', '.deleteInvoice', function(){
@@ -84,9 +191,9 @@ $(document).ready(function(){
 
 	$(document).on('click', '.editInvoice', function(){
 
-		console.log('Edit Invoice');
+		$('#lineupdateform').hide();
 
-		let _token   = $('meta[name="csrf-token"]').attr('content');
+		let _token = $('meta[name="csrf-token"]').attr('content');
 		var inv_id = $(this).closest('tr').attr('data-id');
 		let ajaxData = {invoice_id: inv_id, _token: _token};
 
@@ -97,10 +204,8 @@ $(document).ready(function(){
 			dataType: 'json',
 			contentType: false,
 			success: function(data){
-				// console.log(data.details.updated_at);
+
 				const invoicedate = new Date(data.details.updated_at);
-				// console.log('invoicedate');
-				// console.log(invoicedate);
 				var displayYearDate = invoicedate.getFullYear();
 				var displayMonthDate = invoicedate.getMonth() + 1;
 				var displayDayDate = invoicedate.getDate();
@@ -110,8 +215,6 @@ $(document).ready(function(){
 				$('#invoice_name').val(data.details.invoice_name);
 				$('#invoice_desc').val(data.details.invoice_desc);
 				$('#created_date').text(displayYearDate + '-' + displayMonthDate + '-' + displayDayDate);
-
-				console.log(inv_id);
 
 				buildInvoiceLines(inv_id);
 
@@ -124,6 +227,39 @@ $(document).ready(function(){
 	});
 
 });
+
+function getProductInfo (products, product_id) {
+
+	var returnProd;
+
+	$.each(products, function(key, product){
+		if ( product.id == product_id ){
+			returnProd = product;
+		}
+	});
+
+	return returnProd;
+}
+
+function addCommas(nStr) {
+	nStr += '';
+	var x = nStr.split('.');
+	var x1 = x[0];
+	var x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
+}
+
+function populateProductSelect (products) {
+	var $select = $('#inputProduct'); 
+	$select.empty().append('<option value="">Choose a product</option>');
+	$.each(products,function(key, product) {
+		$select.append('<option value=' + product.id + '>' + product.product_name + '</option>');
+	});
+}
 
 function padInvoiceNumber(id) {
 	const prefix = 'INV_';
@@ -154,7 +290,6 @@ function getInvoiceList() {
 		contentType: false,
 		success: function (response) {
 			var output = '';
-			// console.log(response);
 			$.each(response.details, function(data1,data2){
 				var row = invoiceRow(data2.id, data2.invoice_name, data2.invoice_desc);
 				output += row;
@@ -173,19 +308,35 @@ function invoiceRow (invoiceId, invoiceName, invoiceDesc) {
 
 function buildInvoiceLines (invoiceid) {
 
-	var row = '<tr><td>Product 1</td><td>2</td><td>R20.00</td><td>R40.00</td></tr>';
-	$("#invoice-line-table>tbody").html(row);
+	$.ajax({
+		url: '/getInvoiceLineDetails',
+		type: 'get',
+		data: {inv_id: invoiceid},
+		success: function(response) {
+			var allrows = '';
+			$.each(response.invoicelinesData, function(data1,data2){
+				var row = '<tr id="' + data2.invoice_line_id + '">' + TableCell(data2.product_name) + TableCell(data2.quantity) + TableCell(data2.unitprice) + TableCell(data2.linetotal) + actionInvoiceLine () + '</tr>';
+				allrows = allrows + row;
+			});
+			$("#invoice-line-table>tbody").html(allrows);
+		}
+	});
 
-	
+}
+function TableCell(val) {
+	return '<td>' + val + '</td>';
+}
 
-	{/* <div class="form-row">
-	<div class="form-group col-md-6"><label for="inputCity">City</label><input type="text" class="form-control" id="inputCity"></div>
-	<div class="form-group col-md-4"><label for="inputState">State</label><select id="inputState" class="form-control"><option selected>Choose...</option><option>...</option></select></div>
-	<div class="form-group col-md-2"><label for="inputZip">Zip</label><input type="text" class="form-control" id="inputZip"></div>
-	</div> */}
+function actionInvoiceLine () {
+	return '<td style="text-align: center;">'+editInvoiceLine()+'&nbsp;'+deleteInvoiceLine()+'</i></td>';
+}
 
-	// invoiceLinesData
+function editInvoiceLine () {
+	return '<i class="icon-pencil edit-invoiceline"></i>';
+}
 
+function deleteInvoiceLine () {
+	return '<i class="icon-trash delete-invoiceline"></i>';
 }
 
 function editAndSaveButtons() {

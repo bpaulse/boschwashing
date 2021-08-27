@@ -39,6 +39,29 @@
 						</form>
 					</tr>
 				</table>
+				<table class="table">
+					<tr>
+						<td>
+							<div class="form-row" id="lineupdateform">
+								<div class="form-group col-md-4">
+									<label for="inputProduct">Product</label>
+									<select id="inputProduct" class="form-control">
+										<option selected>Choose...</option>
+									</select>
+								</div>
+								<div class="form-group col-md-4">
+									<label for="inputQuantity">Quantity</label>
+									<input type="text" class="form-control" id="inputQuantity" value="">
+									<input type="hidden" id="inv_line_id" value="">
+								</div>
+								<div class="form-group col-md-4">
+									<label for="button" style="color: white;">Update</label><br />
+									<button class="btn btn-primary update-productline">Update</button>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
 
 				<div class="card">
 					<div class="card-header">
@@ -57,12 +80,27 @@
 									<th>Qty</th>
 									<th>Unit Price</th>
 									<th>Price</th>
+									<th style="text-align: center;">Action</th>
 								</tr>
 							</thead>
 							<tbody></tbody>
 						</table>
 					</div>
 				</div>
+
+				<div class="card">
+					<div class="card-header">
+						<table class="table table-hover table-condensed">
+							<thead>
+								<tr>
+									<th class="w-75 bg-success text-right">Total: </th>
+									<th class="w-25 bg-success invoiceTotal"></th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+
 
 
 			</div>
