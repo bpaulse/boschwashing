@@ -49,14 +49,20 @@
 										<option selected>Choose...</option>
 									</select>
 								</div>
-								<div class="form-group col-md-4">
+								<div class="form-group col-md-4" style="border: blue 0px solid;">
 									<label for="inputQuantity">Quantity</label>
 									<input type="text" class="form-control" id="inputQuantity" value="">
 									<input type="hidden" id="inv_line_id" value="">
 								</div>
 								<div class="form-group col-md-4">
-									<label for="button" style="color: white;">Update</label><br />
-									<button class="btn btn-primary update-productline">Update</button>
+									<div style="float: left; width: 50%; height: 100%; font-size: 10px; border: 0px solid black;; padding-top: 12%;">
+										UnitPrice - <span id="unitpriceDesc"></span><br />
+										Quantity - <span id="quantityDesc"></span><br />
+										Total - <span id="TotalDesc"></span>
+									</div>
+									<div style="float: right; width: 50%; height: 100%; border: 0px solid black; padding-top: 12%;">
+										<button class="btn btn-primary w-100 update-productline">Update</button>
+									</div>
 								</div>
 							</div>
 						</td>

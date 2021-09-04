@@ -64,30 +64,74 @@ $(document).ready(function(){
 	// });
 
 	$(document).on('click', '#add-invoice-line', function(e){
+
 		console.log('add-invoice-line');
+		$('#lineupdateform').show();
+
+		//populate amount
+		$.ajax({
+			method: 'get',
+			url: '/getProductInfo',
+			data: {},
+			dataType: 'json',
+			contentType: false,
+			success: function(data){
+				populateProductSelect(data.products);
+				// reset values
+				$('#quantityDesc').text('');
+				$('#unitpriceDesc').text('');
+				$('#TotalDesc').text('');
+
+			},
+			error: function(xhr, ajaxOptions, thrownError){
+				alert(xhr.status);
+				alert(thrownError);
+			}
+		});
+
+	});
+
+	$(document).on('change', '#inputProduct', function(event){
+		console.log('on change dropdown');
+		// console.log($(this).val());
+		// console.log(event.target.value);
+		var product_id = event.target.value;
+		if ( product_id === undefined || product_id == null || product_id === 0 || product_id === '' ) {
+			console.log('product undefined');
+		} else {
+			console.log(product_id);
+			var quantity = $('#inputQuantity').val();
+			console.log( quantity );
+
+			var float= /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
+			// var a = $(".check_int_float").val();
+			if (float.test(quantity)) {
+				// do something
+				console.log('is float');
+				$('#quantityDesc').text(quantity);
+				$('#unitpriceDesc').text('');
+				$('#TotalDesc').text('');
+			} else {
+				//if it's NOT valid
+				console.log('Value must be float or int'); 
+			}
+
+		}
 	});
 
 	$(document).on('click', '.update-productline', function(e){
 
 		const currency = 'R';
 
-		console.log('update-productline');
 		var quantity = $('#inputQuantity').val();
 		var product_id = $('#inputProduct').val();
 		var inv_line_id = $('#inv_line_id').val();
-
-		console.log(inv_line_id);
-
-		console.log(quantity, product_id);
-		console.log(parseFloat(quantity).toFixed(2));
 
 		var ajaxData = {
 			invoice_line_id: inv_line_id,
 			quantity: parseFloat(quantity).toFixed(2),
 			product_id: product_id
 		};
-
-		console.log(ajaxData);
 
 		$('#lineupdateform').hide();
 
@@ -97,33 +141,21 @@ $(document).ready(function(){
 			data: ajaxData,
 			headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
 			success: function(response) {
-				console.log(response);
 
 				if ( response.code === 1 ) {
 					$('#lineupdateform').hide();
 					toastr.success(response.msg);
 
-					console.log(response.data.invoiceLine.product_id);
-					console.log(response.data.products);
-
 					var prodInfo = getProductInfo(response.data.products, response.data.invoiceLine.product_id);
-
-					console.log('prodInfo');
-					console.log(prodInfo);
 
 					$('#' + inv_line_id + ' td:nth-child(1)').text(prodInfo.product_name);
 					$('#' + inv_line_id + ' td:nth-child(2)').text(ajaxData.quantity);
 					$('#' + inv_line_id + ' td:nth-child(3)').text(currency + ' ' + prodInfo.unitprice);
 
 					var totalPrice = parseFloat(ajaxData.quantity) * parseFloat(prodInfo.unitprice);
-
-					// n = 10000;
-					// r = n.toFixed(2); //10000.00
-					// addCommas(r); // 10,000.00
-
 					$('#' + inv_line_id + ' td:nth-child(4)').text(currency + ' ' + addCommas(totalPrice.toFixed(2)));
 
-					$('.invoiceTotal').text();
+					$('.invoiceTotal').text(response.data.newTotal);
 
 				} else {
 					toastr.warning(response.msg);
@@ -152,34 +184,16 @@ $(document).ready(function(){
 		console.log(trid);
 	});
 
+	$(document).on('click', '.add-invoiceline', function(){
+		console.log('add-invoiceline');
+	});
+
 	$(document).on('click', '.edit-invoiceline', function(){
 	
 		var trid = $(this).closest('tr').attr('id');
-		// console.log('edit');
-		// console.log(trid);
 		$('#lineupdateform').show();
 
-		//populate amount
-		$.ajax({
-			method: 'get',
-			url: '/getInvoiceLineInfo',
-			data: {inv_line_id: trid},
-			dataType: 'json',
-			contentType: false,
-			success: function(data){
-				// console.log(data.invoicelineInfo);
-				populateProductSelect(data.products);
-				$('#inputQuantity').val(parseFloat(data.invoicelineInfo.quantity).toFixed(2));
-				$("#inputProduct").val(data.invoicelineInfo.product_id);
-				// console.log('trid');
-				// console.log(trid);
-				$("#inv_line_id").val(trid);
-			},
-			error: function(xhr, ajaxOptions, thrownError){
-				alert(xhr.status);
-				alert(thrownError);
-			}
-		});
+		getInvoiceLineInfo(trid);
 
 	});
 
@@ -188,6 +202,66 @@ $(document).ready(function(){
 		var i = $(this).closest('tr').attr('data-id');
 		console.log(i);
 	});
+
+	$(document).on('keyup', '#inputQuantity', function(event){
+
+		console.log('QUANTITY');
+		console.log($(this).val());
+
+		// console.log('isNumberKey');
+		// console.log( isNumberKey(event).status );
+
+		var quantityVal = $(this).val();
+		var product_id = $('#inputProduct').val();
+
+		console.log(product_id);
+
+		if ( !isNumberKey(event).status ) {
+			var currentString = $(this).val();
+			// check the number of occurances of the dots
+			newString = currentString.slice(0, -1);
+			$(this).val(newString);
+			quantityVal = newString;
+		}
+
+		console.log('quantityVal');
+		console.log(quantityVal);
+
+		let doAjax = false;
+
+		if ( doAjax ) {
+			$.ajax({
+				method: 'get',
+				// url: '/getInvoiceLineInfo',
+				url: '/getProductInfo',
+				data: ajaxData,
+				dataType: 'json',
+				contentType: false,
+				success: function(data){
+		
+					console.log('invoicelineinfo');
+					console.log(data);
+
+					var linetotal = quantityVal * data.unitprice;
+					console.log(linetotal);
+					console.log(data.unitprice);
+
+					console.log('######################################################');
+
+					// $('#quantityDesc').text(parseFloat(quantityVal).toFixed(2));
+					// $('#unitpriceDesc').text('R ' + data.unitprice);
+					// $('#TotalDesc').text('R ' + linetotal);
+		
+				},
+				error: function(xhr, ajaxOptions, thrownError){
+					alert(xhr.status);
+					alert(thrownError);
+				}
+			});
+		}
+	});
+
+	// onchange of select of products
 
 	$(document).on('click', '.editInvoice', function(){
 
@@ -228,6 +302,62 @@ $(document).ready(function(){
 
 });
 
+
+function getInvoiceLineInfo (invoicelineid) {
+	//populate amount
+	$.ajax({
+		method: 'get',
+		url: '/getInvoiceLineInfo',
+		data: {inv_line_id: invoicelineid},
+		dataType: 'json',
+		contentType: false,
+		success: function(data){
+
+			console.log('invoicelineinfo');
+			console.log(data);
+
+			populateProductSelect(data.products);
+
+			$('#inputQuantity').val(parseFloat(data.invoicelineInfo.quantity).toFixed(2));
+			$("#inputProduct").val(data.invoicelineInfo.product_id);
+			$("#inv_line_id").val(invoicelineid);
+
+			var linetotal = data.invoicelineInfo.quantity * data.unitprice;
+			console.log(linetotal);
+			console.log(data.unitprice);
+
+			$('#quantityDesc').text(parseFloat(data.invoicelineInfo.quantity).toFixed(2));
+			$('#unitpriceDesc').text('R ' + data.unitprice);
+			$('#TotalDesc').text('R ' + linetotal);
+
+		},
+		error: function(xhr, ajaxOptions, thrownError){
+			alert(xhr.status);
+			alert(thrownError);
+		}
+	});
+}
+
+function isNumberKey(evt) {
+	var charCode = (evt.which) ? evt.which : evt.keyCode;
+	if (charCode != 46 && charCode != 190 && charCode > 31 && (charCode < 48 || charCode > 57) && (charCode < 96 || charCode > 105)) {
+		console.log('failed: ' + charCode);
+		return {'status': false};
+	}
+	return {'status': true};
+}
+
+function invoiceLineStatusString (quantity, unitprice) {
+	var tt = quantity * unitprice;
+
+	output = '<table style="border: 1px solid black;">';
+	output = output + '<tr><td>UnitPrice</td><td>'+unitprice+'</td><td>Total</td></tr>'
+	output = output + '<tr><td>Quantity</td><td>'+quantity+'</td><td>'+tt+'</td></tr>';
+	output = output + '</table>';
+
+	return output;
+}
+
 function getProductInfo (products, product_id) {
 
 	var returnProd;
@@ -254,10 +384,14 @@ function addCommas(nStr) {
 }
 
 function populateProductSelect (products) {
+
+	console.log('products');
+	console.log(products);
+
 	var $select = $('#inputProduct'); 
 	$select.empty().append('<option value="">Choose a product</option>');
 	$.each(products,function(key, product) {
-		$select.append('<option value=' + product.id + '>' + product.product_name + '</option>');
+		$select.append('<option value="' + product.id + '" data-unitprice="' + product.unitprice	 + '">' + product.product_name + '</option>');
 	});
 }
 
@@ -318,11 +452,13 @@ function buildInvoiceLines (invoiceid) {
 				var row = '<tr id="' + data2.invoice_line_id + '">' + TableCell(data2.product_name) + TableCell(data2.quantity) + TableCell(data2.unitprice) + TableCell(data2.linetotal) + actionInvoiceLine () + '</tr>';
 				allrows = allrows + row;
 			});
-			$("#invoice-line-table>tbody").html(allrows);
+			$('#invoice-line-table>tbody').html(allrows);
+			$('.invoiceTotal').text(response.invoiceTotal);
 		}
 	});
 
 }
+
 function TableCell(val) {
 	return '<td>' + val + '</td>';
 }
