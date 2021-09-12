@@ -14,8 +14,15 @@ class CreateAthletesTable extends Migration
     public function up()
     {
         Schema::create('athletes', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->string('Name');
+            $table->string('Surname');
+            $table->string('cellphone');
+            $table->string('email');
+            $table->unsignedInteger('athletetype');
+            $table->unsignedInteger('event_id');
             $table->timestamps();
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });
     }
 

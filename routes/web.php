@@ -21,7 +21,9 @@ Route::post('/updateInvoiceLine', [InvoiceLineController::class, 'UpdateInvoiceL
 
 Route::get('/printpdf', [InvoiceController::class, 'printPDF'])->name('print.pdf');
 
-Route::get('/events', [EventController::class, 'eventslist']); 
+Route::get('/events', [EventController::class, 'eventslist']);
+Route::post('/add-event', [EventController::class, 'addEvent'])->name('add.event');
+Route::get('/getEventsList', [EventController::class, 'getEventsList'])->name('get.events.list');
 
 // Route::get('dashboard', [CustomAuthController::class, 'dashboard']); 
 Route::get('login', [CustomAuthController::class, 'login'])->name('auth.login');
