@@ -5,7 +5,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceLineController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\EventController;
-
+use App\Http\Controllers\EventDetailController;
 
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
@@ -21,10 +21,23 @@ Route::post('/updateInvoiceLine', [InvoiceLineController::class, 'UpdateInvoiceL
 
 Route::get('/printpdf', [InvoiceController::class, 'printPDF'])->name('print.pdf');
 
+// Events
 Route::get('/events', [EventController::class, 'eventslist']);
 Route::post('/add-event', [EventController::class, 'addEvent'])->name('add.event');
 Route::get('/getEventsList', [EventController::class, 'getEventsList'])->name('get.events.list');
 
+
+Route::get('/displayEventDetails/{id}', [EventController::class, 'displayEventDetails']);
+Route::get('/getWodsForEvent', [EventDetailController::class, 'getWodsForEvent']);
+Route::get('/getAthleteForEvent', [EventDetailController::class, 'getAthleteForEvent']);
+
+Route::get('/getEventName', [EventController::class, 'getEventName']);
+
+Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
+
+// Route::get('/getEventsList', [EventDetailController::class, 'getEventsList'])->name('get.events.list');
+
+// User Management
 // Route::get('dashboard', [CustomAuthController::class, 'dashboard']); 
 Route::get('login', [CustomAuthController::class, 'login'])->name('auth.login');
 // Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('login.custom'); 

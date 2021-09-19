@@ -2,11 +2,11 @@ $(document).ready(function(){
 
 	console.log('events');
 
-	// $ ('#event_date').datepicker();
-
 	toastr.options.preventDuplicates = false;
 
 	loadEvents();
+
+	$(document).on('click', '.eventDetail', myFunc);
 
 	$('#add-event-form').on('submit', function(e){
 
@@ -83,8 +83,12 @@ $(document).ready(function(){
 	}
 
 	function editAndSaveButtons() {
-		return '<button class="btn btn-info editInvoice"><i class="icon-pencil"></i></button>' + '&nbsp;' + '<button class="btn btn-danger deleteInvoice">' + '<i class="icon-trash"></i>' + '</button>' + '&nbsp;' + '<button class="btn btn-success deleteInvoice">' + '<i class="icon-trash"></i>' + '</button>';
+		return '<button class="btn btn-info editInvoice"><i class="icon-pencil"></i></button>' + '&nbsp;' + '<button class="btn btn-danger deleteInvoice">' + '<i class="icon-trash"></i>' + '</button>' + '&nbsp;' + '<button class="btn btn-success eventDetail">' + '<i class="icon-chevron-right"></i>' + '</button>';
 	}
 
+	function myFunc(e){
+		var event_id = $(this).closest('tr').attr("data-id");
+		window.location.href = '/displayEventDetails/' + event_id;
+	}
 
 });

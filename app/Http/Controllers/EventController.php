@@ -80,12 +80,21 @@ class EventController extends Controller
 		// $invoiceLine->product_id = $request->product_id;
 		// $save = $invoiceLine->save();
 
-
 	}
 
 	public function getEventsList() {
 		$events = Event::all();
 		return response()->json(['details' => $events]);
+	}
+
+	public function getEventName(Request $request) {
+		$eventid = $request->eventid;
+		$event = Event::find($eventid);
+		return response()->json(['name' => $event->event_name]);
+	}
+
+	public function displayEventDetails($eventid) {
+		return view('events.detail')->with(['eventid' => $eventid]);
 	}
 
 }

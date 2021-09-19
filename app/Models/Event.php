@@ -7,5 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    use HasFactory;
+	use HasFactory;
+
+	public function athlete() {
+		return $this->hasMany(Athlete::class);
+	}
+
+	public function wod() {
+		return $this->hasMany(Wod::class);
+	}
+
 }
