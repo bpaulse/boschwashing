@@ -34,8 +34,11 @@ Route::get('/getAthleteForEvent', [EventDetailController::class, 'getAthleteForE
 Route::get('/getEventName', [EventController::class, 'getEventName']);
 
 Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
+Route::post('/add-athlete', [EventDetailController::class, 'addAthlete'])->name('add.athlete');
 
-// Route::get('/getEventsList', [EventDetailController::class, 'getEventsList'])->name('get.events.list');
+Route::get('/wodDetails', [EventDetailController::class, 'wodDetails']);
+
+Route::get('/getAthletesForEvent', [EventDetailController::class, 'getAthletesForEvent']);
 
 // User Management
 // Route::get('dashboard', [CustomAuthController::class, 'dashboard']); 

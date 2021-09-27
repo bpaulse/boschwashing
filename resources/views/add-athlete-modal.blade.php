@@ -7,9 +7,10 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<div class="modal-body">
-				<table class="table">
-					<form>
+			<form action="{{ route('add.athlete') }}" method="POST" id="add-athlete-form">
+				<div class="modal-body">
+					<table class="table">
+						@csrf
 						<tr>
 							<td>
 								<div class="form-group">
@@ -23,7 +24,7 @@
 									<input type="text" class="form-control" id="athlete_surname" value="">
 								</div>
 							</td>
-							{{-- <input type="hidden" class="form-control" id="invoice_id" value=""> --}}
+							<input type="hidden" class="form-control" id="event_id" value="">
 						</tr>
 						<tr>
 							<td>
@@ -39,16 +40,16 @@
 								</div>
 							</td>
 						</tr>
-						<tr>athlete_type
+						<tr>
 							<td>
 								<div class="form-group">
 									<label for="athlete_type" class="col-form-label">Category:</label>
 									<select class="form-control" id="athlete_type">
 										<option>-----</option>
-										<option>RX</option>
-										<option>Intermediate</option>
-										<option>Beginner</option>
-									  </select>
+										<option value="4">RX</option>
+										<option value="5">Intermediate</option>
+										<option value="6">Beginner</option>
+									</select>
 								</div>
 							</td>
 							<td>
@@ -56,20 +57,21 @@
 									<label for="gender" class="col-form-label">Gender:</label>
 									<select class="form-control" id="gender">
 										<option>-----</option>
-										<option>Female</option>
-										<option>Male</option>
-									  </select>
+										<option value="7">Female</option>
+										<option value="8">Male</option>
+										<option value="9">Mixed</option>
+									</select>
 								</div>
 							</td>
 						</tr>
-					</form>
-				</table>
+					</table>
 
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary saveInvoice">Add</button>
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary saveAthlete">Add</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

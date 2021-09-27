@@ -5,17 +5,19 @@ $(document).ready(function(){
 	// get name of the event
 	var eventid = window.location.href.split('/').pop();
 
-	setTableHeader (eventid);
-	loadWods(eventid);
+	// setTableHeader (eventid);
+	loadAthletes(eventid);
 
-	$(document).on('click', '.backEvent', backToEvents);
+	// $(document).on('click', '.backEvent', backToEvents);
 
-	$(document).on('click', '.addAthlete', function () {
-		console.log('addAthlete');
-		$('#event_id').val(eventid);
-		$('#addAthleteModal').modal('show');
-	});
+	// $(document).on('click', '.addAthlete', function () {
+	// 	console.log('addAthlete');
+	// 	$('#event_id').val(eventid);
+	// 	$('#addAthleteModal').modal('show');
+	// });
 
+
+	/*
 	$(document).on('click', '.addWod', function () {
 		console.log('addWod');
 		console.log(eventid);
@@ -25,7 +27,9 @@ $(document).ready(function(){
 		$('#event_id').val(eventid);
 		$('#fortime').hide();
 	});
+	*/
 
+	/*
 	$(document).on('change', '#wod_type', function () {
 
 		if ( $('#wod_type option:selected').text() === 'For Time' ) {
@@ -35,7 +39,9 @@ $(document).ready(function(){
 		}
 
 	});
+	*/
 
+	/*
 	$(document).on('submit', '#add-wod-form', function(evt){
 
 		evt.preventDefault();
@@ -97,7 +103,9 @@ $(document).ready(function(){
 		}
 
 	});
+	*/
 
+	/*
 	$(document).on('submit', '#add-athlete-form', function(evt){
 
 		evt.preventDefault();
@@ -171,31 +179,24 @@ $(document).ready(function(){
 		}
 
 	});
+	*/
 
+	/*
 	$(document).on('click', '.wodDetails', function(evt) {
 		console.log('wodDetails');
 		// var event_id = $(this).closest('tr').attr("data-id");
 		window.location.href = '/wodDetails';
 	});
+	*/
 
 });
 
-function backToEvents () {
-	console.log('back button');
-	window.location.href = '/events';
-}
 
-function addAthlete () {
-	console.log('addAthlete');
-	$('#event_id').val(eventid);
-	$('#addAthleteModal').modal('show');
-}
-
-function loadWods(eventid) {
+function loadAthletes(eventid) {
 
 	$.ajax({
 		type: 'GET',
-		url: '/getWodsForEvent',
+		url: '/getAthletesForEvent',
 		data: {eventid: eventid},
 		dataType: 'json',
 		contentType: false,
@@ -220,6 +221,19 @@ function loadWods(eventid) {
 		}
 	});
 
+}
+
+
+/*
+function backToEvents () {
+	console.log('back button');
+	window.location.href = '/events';
+}
+
+function addAthlete () {
+	console.log('addAthlete');
+	$('#event_id').val(eventid);
+	$('#addAthleteModal').modal('show');
 }
 
 function wodRow (event, type) {
@@ -264,3 +278,5 @@ function setTableHeader (event_id) {
 	});
 
 }
+
+*/

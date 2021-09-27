@@ -15,8 +15,7 @@ class CreateAthletesTable extends Migration
     {
         Schema::create('athletes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('Name');
-            $table->string('Surname');
+            $table->string('name');
             $table->string('cellphone');
             $table->string('email');
             $table->unsignedInteger('athletetype');

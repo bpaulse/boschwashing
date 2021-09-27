@@ -1,6 +1,3 @@
-<?php
-// echo $eventid;
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,34 +11,26 @@
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-	<title>WOD List</title>
+	<title>Wod Details</title>
 </head>
-<body data-event_id="<?php echo $eventid; ?>">
+<body>
+
+	{{-- <a href="{{route('print.pdf')}}">Print PDF</a> --}}
+
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
 			<div class="col-md-12">
-				<div class="w-100 text-right p-1">
-					<button class="btn btn-info text-right backEvent">Back</button>
-				</div>
 				<div class="card">
-					<div class="card-header">
-						<div style="float: left; width: 50%; border: 0px solid black;">
-							<i class="icon-list"></i> <span id="tableHeader"></span>
-						</div>
-						<div style="float: right; width: 50%; border: 0px solid black; text-align: right;">
-							<span class="addAthlete"><img src="{{ asset('images/athlete.png') }}" style="width: 5%;"></span>
-							<span class="addWod"><img src="{{ asset('images/workout.png') }}" style="width: 5%;"></span>
-						</div>
-					</div>
+					<div class="card-header"><i class="icon-list"></i> WOD Detail(s)</div>
 					<div class="card-body">
-						<table class="table table-hover table-condensed" id="wodlist-table">
+						<table class="table table-hover table-condensed" id="athletes-table">
 							<thead>
-								<th style="width: 20%">Event</th>
-								<th style="width: 40%">Description</th>
-								<th style="width: 20%">WOD Type</th>
-								<th style="width: 20%">Action</th>
+								<th style="width: 30%">Name</th>
+								<th style="width: 30%">Category</th>
+								<th style="width: 30%">Gender</th>
+								<th style="width: 10%">Action</th>
 							</thead>
-							<tbody id='wodData'></tbody>
+							<tbody id='woddetails'></tbody>
 						</table>
 					</div>
 				</div>
@@ -49,8 +38,7 @@
 		</div>
 	</div>
 
-	@include('add-athlete-modal');
-	@include('add-wod-modal');
+	@include('add-woddetail-modal');
 
 	<script src="{{ asset('jquery/jquery-3.6.0.min.js') }}"></script>
 	<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
@@ -59,7 +47,7 @@
 	<script src="{{ asset('sweetalert2/sweetalert2.min.js') }}"></script>
 	<script src="{{ asset('toastr/toastr.min.js') }}"></script>
 
-	<script type="text/javascript" src="{{ asset('js/eventDetail.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/woddetails.js') }}"></script>
 
 </body>
 </html>
