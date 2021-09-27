@@ -36,7 +36,7 @@ Route::get('/getEventName', [EventController::class, 'getEventName']);
 Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
 Route::post('/add-athlete', [EventDetailController::class, 'addAthlete'])->name('add.athlete');
 
-Route::get('/wodDetails', [EventDetailController::class, 'wodDetails']);
+Route::get('/wodDetails/{id}', [EventDetailController::class, 'wodDetails']);
 
 Route::get('/getAthletesForEvent', [EventDetailController::class, 'getAthletesForEvent']);
 

@@ -23,7 +23,7 @@ class EventDetailController extends Controller {
 	}
 
 	public function getAthletesForEvent () {
-		
+		var_dump('Nevan');
 	}
 	
 	public function addWod (Request $request) {

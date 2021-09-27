@@ -175,7 +175,8 @@ $(document).ready(function(){
 	$(document).on('click', '.wodDetails', function(evt) {
 		console.log('wodDetails');
 		// var event_id = $(this).closest('tr').attr("data-id");
-		window.location.href = '/wodDetails';
+		// var event_id = 6;
+		window.location.href = '/wodDetails/' + eventid;
 	});
 
 });

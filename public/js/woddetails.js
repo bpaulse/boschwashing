@@ -194,6 +194,8 @@ $(document).ready(function(){
 
 function loadAthletes(eventid) {
 
+	console.log('loadAthletes');
+
 	$.ajax({
 		type: 'GET',
 		url: '/getAthletesForEvent',
