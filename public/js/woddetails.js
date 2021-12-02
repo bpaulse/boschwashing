@@ -2,44 +2,59 @@ $(document).ready(function(){
 
 	toastr.options.preventDuplicates = false;
 
-	// get name of the event
-	var eventid = window.location.href.split('/').pop();
+	// var eventid = window.location.href.split('/').pop();
+	var chunks = window.location.href.split('/');
 
-	// setTableHeader (eventid);
+	// console.log(chunks.length);
+	var wodid = chunks[chunks.length-1];
+	var eventid = chunks[chunks.length-2];
+
+	console.log('wodid');
+	console.log(wodid);
+
 	loadAthletes(eventid);
 
-	// $(document).on('click', '.backEvent', backToEvents);
-
-	// $(document).on('click', '.addAthlete', function () {
-	// 	console.log('addAthlete');
-	// 	$('#event_id').val(eventid);
-	// 	$('#addAthleteModal').modal('show');
-	// });
-
-
-	/*
-	$(document).on('click', '.addWod', function () {
-		console.log('addWod');
-		console.log(eventid);
-		$('#addEventModal').modal('show');
-		// hide time element
-
-		$('#event_id').val(eventid);
-		$('#fortime').hide();
+	$(document).on('click', '.backEventDetails', function(evt){
+		console.log('backeventdetails');
+		// window.location.href = '/wodDetails/' + eventid + '/' + wodid;
+		window.location.href = '/displayEventDetails/' + eventid;
 	});
-	*/
 
-	/*
-	$(document).on('change', '#wod_type', function () {
+	$(document).on('click', '.insertScores', function(evt){
+		console.log('enter wod scores');
+		$('#wodScoreModal').modal('show');
 
-		if ( $('#wod_type option:selected').text() === 'For Time' ) {
-			$('#fortime').show();
-		} else {
-			$('#fortime').hide();
-		}
+		// set wodid on modal
+		console.log(wodid);
+		$('#wod_id').val(wodid);
+
+		var woddesc = getWODDesc(wodid);
+
+		console.log(woddesc);
+
+		$('#woddescinfo').html(woddesc);
 
 	});
-	*/
+
+	$("#athlete_search").keyup(function() {
+
+		var event_id = 1;
+
+		var dInput = $(this).val();
+		console.log(dInput);
+
+		$.ajax({
+			type: 'GET',
+			url: '/searchAthlete',
+			data: { eventid: event_id, searchterm: dInput},
+			dataType: 'json',
+			contentType: false,
+			sucess: function(response) {
+				console.log(response);
+			}
+		})
+
+	});
 
 	/*
 	$(document).on('submit', '#add-wod-form', function(evt){
@@ -93,7 +108,6 @@ $(document).ready(function(){
 						);
 
 						$('#nodata').remove();
-						$('#wodData').append(row);
 					}
 
 				},
@@ -191,6 +205,20 @@ $(document).ready(function(){
 
 });
 
+function getWODDesc(wodid) {
+	console.log(wodid);
+
+	$.ajax({
+		type: 'GET',
+		url: '/getWODDesc',
+		data: {wodid: wodid},
+		dataType: 'json',
+		contentType: false,
+		sucess: function(response) {
+			console.log(response);
+		}
+	})
+}
 
 function loadAthletes(eventid) {
 
@@ -204,19 +232,19 @@ function loadAthletes(eventid) {
 		contentType: false,
 		success: function (response) {
 
+			console.log(response);
+
 			var output = '';
+			// if ( response.count === 0 ) {
+			// 	output = athleteRowNoData();
+			// } else {
+			$.each(response, function(data1,data2){
+				var row = athleteRow({'id': data2.id, 'name': data2.Name + ' ' + data2.Surname, 'category': data2.athleteDivision, 'gender': data2.gender});
+				output += row;
+			});
+			// }
 
-			if ( response.count === 0 ) {
-				// console.log('count zero');
-				output = wodRowNoData();
-			} else {
-				$.each(response.data, function(data1,data2){
-					var row = wodRow({'id': data2.id, 'wodname': data2.wodname, 'woddesc': data2.woddesc, 'wodtype': data2.wodtype, 'settingdesc': data2.settingdesc});
-					output += row;
-				});
-			}
-
-			$('#wodData').html(output);
+			$('#athleteData').html(output);
 		},
 		error: function(e) {
 			console.log(e);
@@ -226,28 +254,17 @@ function loadAthletes(eventid) {
 }
 
 
-/*
-function backToEvents () {
-	console.log('back button');
-	window.location.href = '/events';
+function athleteRow (athlete) {
+	return '<tr data-id="'+ athlete.id +'"><th>' + athlete.name + '</th><th>' + athlete.category + '</th><th>' + athlete.gender  + '</th><th>' + editAndSaveButtons('') + '</th></tr>';
 }
 
-function addAthlete () {
-	console.log('addAthlete');
-	$('#event_id').val(eventid);
-	$('#addAthleteModal').modal('show');
-}
-
-function wodRow (event, type) {
-	return '<tr data-id="'+ event.id +'"><th>' + event.wodname + '</th><th>' + event.woddesc + '</th><th>' + event.settingdesc  + '</th><th>' + editAndSaveButtons('') + '</th></tr>';
-}
-
-function wodRowNoData() {
-	return '<tr id="nodata"><th colspan="4" style="text-align: center; color: blue;">No WODS loaded...</th></tr>';
+function athleteRowNoData() {
+	return '<tr id="nodata"><th colspan="4" style="text-align: center; color: blue;">No ATHLETES loaded...</th></tr>';
 }
 
 function editAndSaveButtons() {
-	return editButton () + '&nbsp;' + '&nbsp;' + clickThroughButton();
+	// return editButton () + '&nbsp;' + '&nbsp;' + clickThroughButton();
+	return editButton ();
 }
 
 function clickThroughButton () {
@@ -259,26 +276,9 @@ function deleteButton() {
 }
 
 function editButton () {
-	return '<button class="btn btn-info editInvoice"><i class="icon-pencil"></i></button>';
+	return '<button class="btn btn-info insertScores"><i class="icon-pencil"></i></button>';
 }
 
-function setTableHeader (event_id) {
-
-	var ajaxData = {eventid: event_id};
-	$.ajax({
-		type: 'GET',
-		url: '/getEventName',
-		data: ajaxData,
-		dataType: 'json',
-		success: function (response) {
-			let tableheader = 'Event' + ' (' + response.name + ')';
-			$('#tableHeader').text(tableheader);
-		},
-		error: function(xhr) {
-			console.log(xhr);
-		}
-	});
-
+function scoreBoardButton() {
+	return '<button class="btn btn-info scoreboard">' + '<i class="icon-trash"></i>' + '</button>';
 }
-
-*/

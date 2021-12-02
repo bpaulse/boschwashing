@@ -31,6 +31,7 @@ class InvoiceController extends Controller
 
 			$invoice->invoice_name = $name;
 			$invoice->invoice_desc = $desc;
+			$invoice->user_id = 1;
 
 			$save = $invoice->save();
 
@@ -38,7 +39,7 @@ class InvoiceController extends Controller
 
 				$invoiceData = [
 					'id' => $invoice->id,
-					'name' => $name,
+					'name' => $name, 
 					'desc' => $desc
 				];
 

@@ -7,6 +7,19 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
+
+			<div class="modal-body">
+				<div class="row mt-5 mb-5">
+					<div class="col col-sm-2">&nbsp;</div>
+					<div class="col col-sm-8">
+						<div class="dropdown">
+							<input type="text" name="search_box" class="form-control form-control-lg" placeholder="Type Here..." id="search_box" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onkeyup="javascript:load_data(this.value)" onfocus="javascript:load_search_history()" />
+							<span id="search_result"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<form action="{{ route('add.athlete') }}" method="POST" id="add-athlete-form">
 				<div class="modal-body">
 					<table class="table">

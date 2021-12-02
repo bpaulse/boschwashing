@@ -12,28 +12,69 @@ class InvoiceLineController extends Controller
 
 	public function UpdateInvoiceLine(Request $request) {
 
-		$invoiceLine = InvoiceLine::find($request->invoice_line_id);
-		$invoiceLine->quantity = $request->quantity;
-		$invoiceLine->product_id = $request->product_id;
-		$save = $invoiceLine->save();
+		// var_dump(
+		// 	$request->invoice_line_id, 
+		// 	$request->quantity, 
+		// 	$request->product_id
+		// );
 
-		if ( $save ){ 
+		if ( $request->invoice_line_id === NULL ) {
 
-			$newTotal = $this->calculateNewTotal($invoiceLine->Invoice->id);
+			$invoiceline = new InvoiceLine();
+			$invoiceline->quantity = $request->quantity;
+			$invoiceline->invoice_id = $request->invoice_id;
+			$invoiceline->product_id = $request->product_id;
 
-			return response()->json([
-				'code' => 1,
-				'msg' => 'Invoice Line updated successfully!',
-				'data' => ['invoiceLine' => $invoiceLine, 'products' => Product::all(), 'newTotal' => $newTotal ]
-			]);
+			$invoiceline->linetotal = $request->quantity * $this->getUnitprice($request->product_id);
+			$save = $invoiceline->save();
+
+			var_dump('save');
+			var_dump($save);
+
 		} else {
-			return response()->json([
-				'code' => 0,
-				'msg' => 'Something went wrong.',
-				'data' => null
-			]);
+
+			$save = InvoiceLine::find($request->invoice_line_id)->update(
+				[
+					'quantity' => $request->quantity,
+					'product_id' => $request->product_id,
+					'linetotal' => $request->quantity * $this->getUnitprice($request->product_id),
+				]
+			);
+
+			var_dump('update');
+			var_dump($save);
+
 		}
 
+		var_dump($save);
+
+		// $invoiceLine = InvoiceLine::find($request->invoice_line_id);	
+		// $invoiceLine->quantity = $request->quantity;
+		// $invoiceLine->product_id = $request->product_id;
+		// $save = $invoiceLine->save();
+
+		// if ( $save ){ 
+
+		// 	$newTotal = $this->calculateNewTotal($invoiceLine->Invoice->id);
+
+		// 	return response()->json([
+		// 		'code' => 1,
+		// 		'msg' => 'Invoice Line updated successfully!',
+		// 		'data' => ['invoiceLine' => $invoiceLine, 'products' => Product::all(), 'newTotal' => $newTotal ]
+		// 	]);
+		// } else {
+		// 	return response()->json([
+		// 		'code' => 0,
+		// 		'msg' => 'Something went wrong.',
+		// 		'data' => null
+		// 	]);
+		// }
+
+	}
+
+	private function getUnitprice ( $productId ) {
+		$product = Product::find( $productId );
+		return $product->unitprice;
 	}
 
 	private function calculateNewTotal ($invoice_id) {
@@ -69,6 +110,13 @@ class InvoiceLineController extends Controller
 	public function getProductInfo() {
 		$products = Product::all();
 		return response()->json([ 'products' => $products ]);
+	}
+
+	public function retrieveProduct (Request $request) {
+
+		$productItem = Product::where('id', $request->id)->get();
+		return response()->json($productItem);
+
 	}
 
 	public function getInvoiceLineDetails(Request $request) {

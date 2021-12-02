@@ -35,7 +35,7 @@
 									<input type="text" class="form-control" id="invoice_desc" value="">
 								</div>
 							</td>
-							<input type="hidden" class="form-control" id="invoice_id" value="">
+							<input type="hidden" class="form-control" id="inv_id" value="">
 						</form>
 					</tr>
 				</table>
@@ -43,6 +43,9 @@
 					<tr>
 						<td>
 							<div class="form-row" id="lineupdateform">
+								<div class="form-group col-md-12" style="text-align: right;">
+									<span class="close-line-item">X</span>
+								</div>
 								<div class="form-group col-md-4">
 									<label for="inputProduct">Product</label>
 									<select id="inputProduct" class="form-control">
@@ -79,31 +82,35 @@
 						</div>
 					</div>
 					<div class="card-body">
-						<table class="table table-hover table-condensed" id="invoice-line-table">
-							<thead>
-								<tr>
-									<th>Product</th>
-									<th>Qty</th>
-									<th>Unit Price</th>
-									<th>Price</th>
-									<th style="text-align: center;">Action</th>
-								</tr>
-							</thead>
-							<tbody></tbody>
-						</table>
+						<div class="table-responsive">
+							<table class="table table-hover table-condensed" id="invoice-line-table">
+								<thead>
+									<tr>
+										<th>Product</th>
+										<th>Qty</th>
+										<th>Unit Price</th>
+										<th>Price</th>
+										<th style="text-align: center;">Action</th>
+									</tr>
+								</thead>
+								<tbody></tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 
 				<div class="card">
 					<div class="card-header">
-						<table class="table table-hover table-condensed">
-							<thead>
-								<tr>
-									<th class="w-75 bg-success text-right">Total: </th>
-									<th class="w-25 bg-success invoiceTotal"></th>
-								</tr>
-							</thead>
-						</table>
+						<div class="table-responsive">
+							<table class="table table-hover table-condensed">
+								<thead>
+									<tr>
+										<th class="w-75 bg-success text-right">Total: </th>
+										<th class="w-25 bg-success invoiceTotal"></th>
+									</tr>
+								</thead>
+							</table>
+						</div>
 					</div>
 				</div>
 

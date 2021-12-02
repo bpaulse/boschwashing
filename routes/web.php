@@ -6,6 +6,7 @@ use App\Http\Controllers\InvoiceLineController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventDetailController;
+use App\Http\Controllers\MailController;
 
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
@@ -18,6 +19,8 @@ Route::get('/getInvoiceLineDetails', [InvoiceLineController::class, 'getInvoiceL
 Route::get('/getInvoiceLineInfo', [InvoiceLineController::class, 'getInvoiceLineById']);
 Route::get('/getProductInfo', [InvoiceLineController::class, 'getProductInfo']);
 Route::post('/updateInvoiceLine', [InvoiceLineController::class, 'UpdateInvoiceLine']);
+
+Route::get('/retrieveProduct', [InvoiceLineController::class, 'retrieveProduct']);
 
 Route::get('/printpdf', [InvoiceController::class, 'printPDF'])->name('print.pdf');
 
@@ -34,11 +37,14 @@ Route::get('/getAthleteForEvent', [EventDetailController::class, 'getAthleteForE
 Route::get('/getEventName', [EventController::class, 'getEventName']);
 
 Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
+Route::post('/add-score', [EventDetailController::class, 'addScore'])->name('add.score');
 Route::post('/add-athlete', [EventDetailController::class, 'addAthlete'])->name('add.athlete');
 
-Route::get('/wodDetails/{id}', [EventDetailController::class, 'wodDetails']);
-
+Route::get('/getWODDesc', [EventDetailController::class, 'getWODDesc']);
+Route::get('/wodDetails/{id}/{wodid}', [EventDetailController::class, 'wodDetails']);
+Route::get('/wodResults/{id}', [EventDetailController::class, 'wodResults']);
 Route::get('/getAthletesForEvent', [EventDetailController::class, 'getAthletesForEvent']);
+Route::get('/searchAthlete', [EventDetailController::class, 'searchAthlete']);
 
 // User Management
 // Route::get('dashboard', [CustomAuthController::class, 'dashboard']); 
@@ -47,3 +53,7 @@ Route::get('login', [CustomAuthController::class, 'login'])->name('auth.login');
 Route::get('registration', [CustomAuthController::class, 'registration'])->name('registration');
 // Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('register.custom'); 
 // Route::get('signout', [CustomAuthController::class, 'signOut'])->name('signout');
+
+Route::get('pdf-create','pdfcontroller@create');
+
+Route::get('/send-email', [MailController::class, 'sendMail']);

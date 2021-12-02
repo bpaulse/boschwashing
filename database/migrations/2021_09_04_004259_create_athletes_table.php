@@ -18,10 +18,13 @@ class CreateAthletesTable extends Migration
             $table->string('name');
             $table->string('cellphone');
             $table->string('email');
-            $table->unsignedInteger('athletetype');
-            $table->unsignedInteger('event_id');
+            $table->unsignedInteger('athletetype_id');
+            $table->unsignedInteger('gender_id');
+            $table->unsignedInteger('wod_id');
             $table->timestamps();
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->foreign('wod_id')->references('id')->on('wods')->onDelete('cascade');
+            $table->foreign('athletetype_id')->references('id')->on('settings')->onDelete('cascade');
+            $table->foreign('gender_id')->references('id')->on('settings')->onDelete('cascade');
         });
     }
 

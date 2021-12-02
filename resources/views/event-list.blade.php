@@ -15,7 +15,7 @@
 </head>
 <body>
 
-	<a href="{{route('print.pdf')}}">Print PDF</a>
+	{{-- <a href="{{route('print.pdf')}}">Print PDXF</a> --}}
 
 	<div class="container">
 		<div class="row" style="margin-top: 45px">

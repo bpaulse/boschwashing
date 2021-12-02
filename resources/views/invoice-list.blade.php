@@ -15,7 +15,7 @@
 </head>
 <body>
 
-	<a href="{{route('print.pdf')}}">Print PDF</a>
+	{{-- <a href="{{route('print.pdf')}}">Print PDF</a> --}}
 
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
@@ -23,15 +23,17 @@
 				<div class="card">
 					<div class="card-header"><i class="icon-list"></i> Invoices</div>
 					<div class="card-body">
-						<table class="table table-hover table-condensed" id="invoices-table">
-							<thead>
-								<th>#</th>
-								<th>Name</th>
-								<th>Description</th>
-								<th>Action</th>
-							</thead>
-							<tbody id='tableData'></tbody>
-						</table>
+						<div class="table-responsive">
+							<table class="table table-hover table-condensed" id="invoices-table">
+								<thead>
+									<th>#</th>
+									<th>Name</th>
+									<th>Description</th>
+									<th>Action</th>
+								</thead>
+								<tbody id='tableData'></tbody>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class EventDetailController extends Controller {
+
 	public function getWodsForEvent (Request $request) {
 
-		$wods = DB::table('wods')->select('wods.wodname', 'wods.woddesc', 'wods.event_id', 'wods.wodtype', 'settings.settingdesc')
+		$wods = DB::table('wods')->select('wods.id', 'wods.wodname', 'wods.woddesc', 'wods.event_id', 'wods.wodtype', 'settings.settingdesc')
 		->join('settings', 'settings.id', '=', 'wods.wodtype')
 		->where('event_id', $request->eventid)
 		->get();
@@ -22,16 +23,51 @@ class EventDetailController extends Controller {
 
 	}
 
-	public function getAthletesForEvent () {
-		var_dump('Nevan');
+	public function getAthletesForEvent (Request $request) {
+		$eventid = $request->input('eventid');
+		$athletes = DB::select("SELECT ath.id, ath.Name, ath.Surname, ath.email, gen.settingdesc as 'gender', athtype.settingdesc as 'athleteDivision', eve.event_name FROM `athletes` as ath INNER JOIN settings as gen ON ath.gender = gen.id INNER JOIN settings as athtype ON ath.athletetype = athtype.id INNER JOIN events as eve ON ath.event_id = eve.id WHERE ath.event_id = ? ORDER BY gen.id, athtype.id", [$eventid]);
+		return response()->json($athletes);
 	}
 	
+	public function searchAthlete (Request $request) {
+		$eventid = $request->input('eventid');
+		$searchterm = $request->input('searchterm');
+		var_dump($eventid, $searchterm);
+		$athletes = DB::select("
+			SELECT 
+				ath.id, 
+				ath.Name, 
+				ath.Surname, 
+				ath.email, 
+				gen.settingdesc as 'gender', 
+				athtype.settingdesc as 'athleteDivision', 
+				eve.event_name FROM `athletes` as ath 
+			INNER JOIN 	
+				settings as gen 
+			ON 
+				ath.gender = gen.id 
+			INNER JOIN 
+				settings as athtype 
+			ON 
+				ath.athletetype = athtype.id 
+			INNER JOIN 
+				events as eve 
+			ON 
+				ath.event_id = eve.id 
+			WHERE ath.event_id = ? 
+			AND (ath.Name LIKE ?) 
+			ORDER 
+				BY gen.id, athtype.id", [$eventid, '%'.$searchterm.'%']);
+		// $athletes = DB::select("SELECT ath.id, ath.Name, ath.Surname, ath.email, gen.settingdesc as 'gender', athtype.settingdesc as 'athleteDivision', eve.event_name FROM `athletes` as ath INNER JOIN settings as gen ON ath.gender = gen.id INNER JOIN settings as athtype ON ath.athletetype = athtype.id INNER JOIN events as eve ON ath.event_id = eve.id WHERE ath.event_id = ? AND ( ath.Name OR ath.Surname OR ath.email) ORDER BY gen.id, athtype.id", [$eventid, ]);
+		return response()->json($athletes);
+	}
+
 	public function addWod (Request $request) {
 
-		$wodname = $request->input('wod_name');;
-		$woddesc = $request->input('wod_desc');;
-		$wodtype = $request->input('wod_type');;
-		$eventid = $request->input('event_id');;
+		$wodname = $request->input('wod_name');
+		$woddesc = $request->input('wod_desc');
+		$wodtype = $request->input('wod_type');
+		$eventid = $request->input('event_id');
 
 		$wod = new Wod();
 		$wod->wodname = $wodname;
@@ -49,6 +85,7 @@ class EventDetailController extends Controller {
 			'wodtype'		=>	$wodtypename->settingdesc,
 			'wodtype_id'	=>	$wod->wodtype,
 			'event_id'		=>	$wod->event_id,
+			// 'wod_id'		=>	$wod->wod_id,
 			'id'			=>	$wod->id
 		];
 
@@ -76,13 +113,14 @@ class EventDetailController extends Controller {
 	
 	public function addAthlete (Request $request) {
 
-		$athlete_name		= $request->input('athlete_name');
-		$athlete_surname	= $request->input('athlete_surname');
-		$email				= $request->input('athlete_email');
-		$cellphone			= $request->input('athlete_mobile');
-		$athletetype		= $request->input('athlete_type');
-		// $gender				= $request->input('gender');
-		$eventid			= $request->input('event_id');
+		$athlete_name			= $request->input('athlete_name');
+		$athlete_surname		= $request->input('athlete_surname');
+		$email					= $request->input('athlete_email');
+		$cellphone				= $request->input('athlete_mobile');
+		$athletetype			= $request->input('athlete_type');
+		$gender					= $request->input('gender');
+		$eventid				= $request->input('event_id');
+		// $wodid					= $request->input('wod_id');
 
 		$athlete = new Athlete();
 
@@ -91,8 +129,9 @@ class EventDetailController extends Controller {
 		$athlete->cellphone 	= $cellphone;
 		$athlete->email 		= $email;
 		$athlete->athletetype 	= $athletetype;
-		// $athlete->gender	 	= $gender;
+		$athlete->gender	 	= $gender;
 		$athlete->event_id 		= $eventid;
+		// $athlete->wod_id 		= $wodid;
 
 		$save = $athlete->save();
 
@@ -121,6 +160,32 @@ class EventDetailController extends Controller {
 
 	public function wodDetails () {
 		return view('wod.details');
+		// return view('wod.details')->with(['eventid' => $eventid]);
+	}
+
+	public function getWODDesc (Request $request) {
+
+		$wodid = $request->input('wodid');
+
+		// var_dump('wodid: ');
+		// var_dump($wodid);
+
+		$wod = Wod::select('*');
+
+		return response()->json($wod);
+
+	}
+
+	public function wodResults ($id) {
+
+		$tabs = DB::select('SELECT settings.id, settings.settingdesc FROM athletes INNER JOIN settings ON athletes.athletetype = settings.id WHERE athletes.event_id = ? GROUP BY settings.settingdesc, settings.id', [$id]);
+
+
+
+		$data = ['tabs' => $tabs];
+
+		return view('wod.results')->with(['data' => $data]);
+
 	}
 
 }

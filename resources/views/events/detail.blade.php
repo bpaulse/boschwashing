@@ -1,5 +1,5 @@
 <?php
-// echo $eventid;
+echo $eventid;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,7 +36,7 @@
 					<div class="card-body">
 						<table class="table table-hover table-condensed" id="wodlist-table">
 							<thead>
-								<th style="width: 20%">Event</th>
+								<th style="width: 20%">WOD Name</th>
 								<th style="width: 40%">Description</th>
 								<th style="width: 20%">WOD Type</th>
 								<th style="width: 20%">Action</th>
