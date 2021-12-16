@@ -11,11 +11,12 @@
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-	<title>Invoice List</title>
+	{{-- <link href="{{ asset('bootstrap/css//font-awesome.css') }}" rel="stylesheet"> --}}
+	<link href="{{ asset('select2/dist/css/select2.min.css') }}" rel='stylesheet' type='text/css'>	
+
+	<title>List of Invocies</title>
 </head>
 <body>
-
-	{{-- <a href="{{route('print.pdf')}}">Print PDF</a> --}}
 
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
@@ -27,6 +28,7 @@
 							<table class="table table-hover table-condensed" id="invoices-table">
 								<thead>
 									<th>#</th>
+									<th>--</th>
 									<th>Name</th>
 									<th>Description</th>
 									<th>Action</th>
@@ -75,6 +77,8 @@
 	<script src="{{ asset('toastr/toastr.min.js') }}"></script>
 
 	<script type="text/javascript" src="{{ asset('js/index.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('select2/dist/js/select2.min.js') }}" ></script>
+
 
 
 </body>

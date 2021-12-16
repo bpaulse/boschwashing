@@ -2,6 +2,8 @@ $(document).ready(function(){
 
 	toastr.options.preventDuplicates = false;
 
+	$("#clientinfo").select2();
+
 	$("#inputQuantity").focus(function() { $(this).select(); } );	
 
 	$('#add-invoice-form').on('submit', function(e){
@@ -31,20 +33,11 @@ $(document).ready(function(){
 							$(form).find('span.'+prefix+'_error').text(val[0]);
 						});
 					} else {
+
 						$(form)[0].reset();
 						toastr.success(response.msg);
-						//append to tableData
-						// console.log(response.data);
-
 						var invoice = response.data;
-
-						// console.log(invoice);
-
-						// console.log(invoice.id);
-						// console.log(invoice.name);
-						// console.log(invoice.desc);
-
-						var row = invoiceRow(response.data.id, response.data.name, response.data.desc);
+						var row = invoiceRow(response.data.id, response.data.name, response.data.desc, response.data.status);
 						$('#tableData').append(row);
 					}
 				}
@@ -56,19 +49,10 @@ $(document).ready(function(){
 
 	getInvoiceList();
 
-	// $(document).on('click', '.saveInvoice', function(){
-	// 	console.log('saveInvoice');
-	// 	$.ajax({
-	// 		url: '',
-	// 		method: 'post'
-	// 	});
-	// 	$('#editInvoiceModal').modal('hide');
-	// });
-
 	$(document).on('click', '#add-invoice-line', function(e){
 
-		// console.log('add-invoice-line');
 		$('#lineupdateform').show();
+		$('.update-productline').html('Add');
 
 		//populate amount
 		$.ajax({
@@ -84,13 +68,22 @@ $(document).ready(function(){
 				$('#inputQuantity').val(1)
 				$('#unitpriceDesc').text('');
 				$('#TotalDesc').text('');
-
 			},
 			error: function(xhr, ajaxOptions, thrownError){
 				alert(xhr.status);
 				alert(thrownError);
 			}
 		});
+
+	});
+
+	$(document).on('change', '#clientinfo', function(event){
+
+		console.log('save clientid');
+
+		var client_id = event.target.value;
+		var invoice_id = $('#inv_id').val();
+		saveClientToInvoice(client_id, invoice_id);
 
 	});
 
@@ -127,9 +120,6 @@ $(document).ready(function(){
 
 		var inv_id = $('#inv_id').val();
 
-		console.log('invoice_id');
-		console.log(inv_id);
-
 		var ajaxData = {
 			invoice_id: inv_id,
 			invoice_line_id: inv_line_id,
@@ -148,26 +138,28 @@ $(document).ready(function(){
 			headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
 			success: function(response) {
 
-				console.log(response);
+				console.log(response.data.invoiceLine.id);
 
-				// if ( response.code === 1 ) {
-				// 	$('#lineupdateform').hide();
-				// 	toastr.success(response.msg);
+				if ( response.code === 1 ) {
 
-				// 	var prodInfo = getProductInfo(response.data.products, response.data.invoiceLine.product_id);
+					$('#lineupdateform').hide();
+					toastr.success(response.msg);
+					var prodInfo = getProductInfo(response.data.products, response.data.invoiceLine.product_id);
 
-				// 	$('#' + inv_line_id + ' td:nth-child(1)').text(prodInfo.product_name);
-				// 	$('#' + inv_line_id + ' td:nth-child(2)').text(ajaxData.quantity);
-				// 	$('#' + inv_line_id + ' td:nth-child(3)').text(currency + ' ' + prodInfo.unitprice);
+					console.log(prodInfo);
 
-				// 	var totalPrice = parseFloat(ajaxData.quantity) * parseFloat(prodInfo.unitprice);
-				// 	$('#' + inv_line_id + ' td:nth-child(4)').text(currency + ' ' + addCommas(totalPrice.toFixed(2)));
+					// $('#' + inv_line_id + ' td:nth-child(1)').text(prodInfo.product_name);
+					// $('#' + inv_line_id + ' td:nth-child(2)').text(ajaxData.quantity);
+					// $('#' + inv_line_id + ' td:nth-child(3)').text(currency + ' ' + prodInfo.unitprice);
 
-				// 	$('.invoiceTotal').text(response.data.newTotal);
+					// var totalPrice = parseFloat(ajaxData.quantity) * parseFloat(prodInfo.unitprice);
+					// $('#' + inv_line_id + ' td:nth-child(4)').text(currency + ' ' + addCommas(totalPrice.toFixed(2)));
 
-				// } else {
-				// 	toastr.warning(response.msg);
-				// }
+					// $('.invoiceTotal').text(response.data.newTotal);
+
+				} else {
+					toastr.warning(response.msg);
+				}
 
 			},
 			error: function(e) { console.log(e) }
@@ -190,8 +182,7 @@ $(document).ready(function(){
 
 	$(document).on('click', '.delete-invoiceline', function(){
 		var trid = $(this).closest('tr').attr('id');
-		console.log('delete');
-		console.log(trid);
+		deleteInvLine(trid);
 	});
 
 	$(document).on('click', '.add-invoiceline', function(){
@@ -233,12 +224,11 @@ $(document).ready(function(){
 	$(document).on('click', '.editInvoice', function(){
 
 		$('#lineupdateform').hide();
+		$('#clientinfodisplay').empty();
 
 		let _token = $('meta[name="csrf-token"]').attr('content');
 		var inv_id = $(this).closest('tr').attr('data-id');
 		let ajaxData = {invoice_id: inv_id, _token: _token};
-
-		console.log(inv_id);
 
 		$.ajax({
 			method: 'get',
@@ -247,6 +237,23 @@ $(document).ready(function(){
 			dataType: 'json',
 			contentType: false,
 			success: function(data){
+
+				console.log('data.invoiceClient');
+				// console.log(data.invoiceClient[0]);
+
+				var currentClientId;
+
+				if ( data.invoiceClient !== null ) {
+					console.log('get clientid');
+					currentClientId = data.invoiceClient[0].client_id;
+					// if (typeof myVar === 'undefined') {
+				} else {
+					console.log('null');
+					currentClientId = 0;
+				}
+
+				console.log('currentClientId:');
+				console.log(currentClientId);
 
 				const invoicedate = new Date(data.details.updated_at);
 				var displayYearDate = invoicedate.getFullYear();
@@ -260,9 +267,13 @@ $(document).ready(function(){
 				$('#invoice_desc').val(data.details.invoice_desc);
 				$('#created_date').text(displayYearDate + '-' + displayMonthDate + '-' + displayDayDate);
 
+				// populate dropdown
+				var user_id = 1;
+
+				populateClientDropdown(user_id, currentClientId);
 				buildInvoiceLines(inv_id);
 
-			},
+0			},
 			error: function (e) {
 				console.log(e);
 			}
@@ -272,6 +283,119 @@ $(document).ready(function(){
 
 });
 
+function deleteInvLine(invLineId) {
+
+	var ajaxData = {ivlId: invLineId};
+
+	$.ajax({
+
+		method: 'get',
+		url: '/deleteInvoiceLineData',
+		data: ajaxData,
+		dataType: 'json',
+		success: function(response){
+
+			var invoiceId = $('inv_id').val();
+
+			if (response.code === 1 ) {
+
+				toastr.success(response.msg + invLineId);
+				$('#' + invLineId).remove();
+				// console.log('invoiceId: ' + invoiceId);
+				updateInvoiceTotal(invoiceId);
+
+			} else {
+
+				alert(response.msg + invLineId);
+
+			}
+
+		},
+		error: function (e) {
+			console.log(e);
+		}
+	});
+}
+
+function setClientDropdown(inv_id) {
+	// console.log('setClientDropdown');
+	// console.log('inv_id');
+	// console.log(inv_id);
+	var client_id = 1;
+	// console.log('client_id');
+	// console.log(client_id);
+	$('#clientinfo').val(1);
+	$("#clientinfo option[value=2]").attr('selected', 'selected');
+}
+
+function populateClientDropdown(user_id, currentClientId) {
+	// console.log('populateClientDropdown');
+	// console.log(user_id);
+	// console.log(currentClientId);
+	getClientLineInfo(user_id, currentClientId);
+}
+
+function saveClientToInvoice(client_id, invoice_id) {
+
+	console.log('saveClientToInvoice');
+
+	var ajaxData = {
+		clientid: client_id,
+		invoiceid: invoice_id
+	};
+
+	console.log(ajaxData);
+
+	$.ajax({
+		method: 'get',
+		url: '/saveClientToInvoice',
+		data: ajaxData,
+		dataType: 'json',
+		success: function(response){
+			// console.log(response.data.clientDetails);
+			// console.log('SaveClientToInvoice');
+			$('#clientinfodisplay').empty();
+
+			var item = response.data.clientDetails;
+			// console.log('item');
+			// console.log(item);
+
+			var clientinfodisplay = "<div style='float: left;'>" + item.companyname + "<br />" + item.name + ' ' + item.surname + "<br />" + item.landline + "<br />" + item.mobile + "<br />" + item.companyreg + "</div>" + "<div style='float: right;'>" + item.address + "<br />" + item.email + "<br />" + item.website + "<br />" + item.vat + "</div>";
+			$('#clientinfodisplay').html(clientinfodisplay);
+		},
+		error: function (e) {
+			console.log(e);
+		}
+	});
+}
+
+function getClientLineInfo (user_id, currentClientId) {
+	//populate amount
+	console.log('user_id');
+	console.log(user_id);
+	$.ajax({
+		method: 'get',
+		url: '/getClientLineInfo',
+		data: {user_id: user_id},
+		dataType: 'json',
+		contentType: false,
+		success: function(data){
+
+			// console.log('getClientLineInfo');
+			// console.log(data);
+
+			// console.log('currentClientId');
+			// console.log(currentClientId);
+
+			populateClientSelect(data, currentClientId);
+
+		},
+		error: function(xhr, ajaxOptions, thrownError){
+			alert(xhr.status);
+			alert(thrownError);
+		}
+	});
+}
 
 function getInvoiceLineInfo (invoicelineid) {
 	//populate amount
@@ -283,9 +407,6 @@ function getInvoiceLineInfo (invoicelineid) {
 		contentType: false,
 		success: function(data){
 
-			// console.log('invoicelineinfo');
-			// console.log(data);
-
 			populateProductSelect(data.products);
 
 			$('#inputQuantity').val(parseFloat(data.invoicelineInfo.quantity).toFixed(2));
@@ -293,12 +414,12 @@ function getInvoiceLineInfo (invoicelineid) {
 			$("#inv_line_id").val(invoicelineid);
 
 			var linetotal = data.invoicelineInfo.quantity * data.unitprice;
-			// console.log(linetotal);
-			// console.log(data.unitprice);
 
 			$('#quantityDesc').text(parseFloat(data.invoicelineInfo.quantity).toFixed(2));
 			$('#unitpriceDesc').text('R ' + data.unitprice);
 			$('#TotalDesc').text('R ' + linetotal);
+
+			$('.update-productline').text('Update');
 
 		},
 		error: function(xhr, ajaxOptions, thrownError){
@@ -354,15 +475,31 @@ function addCommas(nStr) {
 }
 
 function populateProductSelect (products) {
-
-	// console.log('products');
-	// console.log(products);
-
 	var $select = $('#inputProduct'); 
 	$select.empty().append('<option value="">Choose a product</option>');
 	$.each(products,function(key, product) {
 		$select.append('<option value="' + product.id + '" data-unitprice="' + product.unitprice	 + '">' + product.product_name + '</option>');
 	});
+}
+
+function populateClientSelect (data, currentclientid) {
+	var $select = $('#clientinfo');
+	$select.empty().append('<option value="">Choose a Client</option>');
+	$.each(data,function(key, item) {
+
+		if ( item.id === currentclientid ) {
+
+			$select.append('<option value="'+item.id+'" selected="true">'+item.companyname+'</option>');
+			$('#clientinfodisplay').empty();
+			var clientinfodisplay = "<div style='float: left; border: 1px solid black;'>" + item.companyname + "<br />" + item.name + ' ' + item.surname + "<br />" + item.landline + "<br />" + item.mobile + "<br />" + item.companyreg + "</div>" + "<div style='float: right; border: 1px solid black;'>" + item.address + "<br />" + item.email + "<br />" + item.website + "<br />" + item.vat + "</div>";
+			$('#clientinfodisplay').html(clientinfodisplay);
+
+		} else {
+			$select.append('<option value="'+item.id+'">'+item.companyname+'</option>');
+		}
+
+	});
+
 }
 
 function padInvoiceNumber(id) {
@@ -385,6 +522,7 @@ function padInvoiceNumber(id) {
 }
 
 function getInvoiceList() {
+
 	$.ajax({
 		type: 'GET',
 		url: '/getInvoicesList',
@@ -394,8 +532,9 @@ function getInvoiceList() {
 		contentType: false,
 		success: function (response) {
 			var output = '';
+
 			$.each(response.details, function(data1,data2){
-				var row = invoiceRow(data2.id, data2.invoice_name, data2.invoice_desc);
+				var row = invoiceRow(data2.id, data2.invoice_name, data2.invoice_desc, data2.status);
 				output += row;
 			});
 			$('#tableData').html(output);
@@ -428,8 +567,20 @@ function retrieveProduct(productid) {
 	});
 }
 
-function invoiceRow (invoiceId, invoiceName, invoiceDesc) {
-	return '<tr data-id="'+ invoiceId +'"><th>' + invoiceId + '</th><th>' + invoiceName + '</th><th>' + invoiceDesc  + '</th><th>' + editAndSaveButtons() + '</th></tr>';
+function invoiceRow (invoiceId, invoiceName, invoiceDesc, invoiceStatus) {
+	return '<tr data-id="'+ invoiceId +'"><th>' + invoiceId + '</th><th>' + lineStatus(invoiceStatus) + '</th><th>' + invoiceName + '</th><th>' + invoiceDesc  + '</th><th>' + editAndSaveButtons() + '</th></tr>';
+}
+
+function lineStatus(invoiceStatus) {
+	output = '';
+	if ( invoiceStatus == 0 ) {
+		output = 'new_invoice.jfif';
+	} else if ( invoiceStatus == 1 ) {
+		output = 'overdue.png';
+	} else {
+		output = 'paid.jpg'
+	}
+	return '<img src="images/' + output + '" style="width: 35px;" />';
 }
 
 function buildInvoiceLines (invoiceid) {
@@ -442,10 +593,22 @@ function buildInvoiceLines (invoiceid) {
 			var allrows = '';
 			$.each(response.invoicelinesData, function(data1,data2){
 				var row = '<tr id="' + data2.invoice_line_id + '">' + TableCell(data2.product_name) + TableCell(data2.quantity) + TableCell(data2.unitprice) + TableCell(data2.linetotal) + actionInvoiceLine () + '</tr>';
-				// var row = '<tr id="' + data2.invoice_line_id + '">' + TableCell(data2.product_name) + TableCell(data2.quantity) + TableCell(data2.unitprice) + TableCell(data2.linetotal) + '</tr>';
 				allrows = allrows + row;
 			});
 			$('#invoice-line-table>tbody').html(allrows);
+			$('.invoiceTotal').text(response.invoiceTotal);
+		}
+	});
+
+}
+
+function updateInvoiceTotal (invoiceid) {
+
+	$.ajax({
+		url: '/getInvoiceLineDetails',
+		type: 'get',
+		data: {inv_id: invoiceid},
+		success: function(response) {
 			$('.invoiceTotal').text(response.invoiceTotal);
 		}
 	});

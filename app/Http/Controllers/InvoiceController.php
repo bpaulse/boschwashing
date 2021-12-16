@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Invoice;
+use App\Models\InvoiceClient;
 use Illuminate\Support\Facades\Validator;
 // use Yajra\DataTables\Facades\DataTables;
 
@@ -72,29 +73,38 @@ class InvoiceController extends Controller
 	public function getInvoiceDetails(Request $request) {
 		$invoice_id = $request->invoice_id;
 		$invoiceDetails = Invoice::find($invoice_id);
-		return response()->json(['details' => $invoiceDetails]);
+		$invoiceClient = InvoiceClient::where('invoice_id', $invoice_id)->get();
+
+		if ( empty($invoiceClient[0]) ) {
+			return response()->json(['details' => $invoiceDetails, 'invoiceClient' => NULL]);
+		}
+
+		return response()->json(['details' => $invoiceDetails, 'invoiceClient' => $invoiceClient]);
+
 	}
 
 	public function getInvoicesList() {
 
 		$invoices = Invoice::all();
 		return response()->json(['details' => $invoices]);
-		// return json_encode($invoices);
-		// var_dump($invoices);
-		// return DataTables::of($invoices)->make(true);
 
 	}
 
-	public function printPDF()
-    {
-       // This  $data array will be passed to our PDF blade
-       $data = [
-          'title' => 'First PDF for Medium',
-          'heading' => 'Hello from 99Points.info',
-          'content' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.'
+	public function printInvoice () {
+		return view('print.invoice');
+	}
+
+	public function printPDF() {
+
+		// This  $data array will be passed to our PDF blade
+
+		$data = [
+			'title' => 'First PDF for Medium',
+			'heading' => 'Hello from 99Points.info',
+			'content' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.'
 		];
-        
-        // $pdf = PDF::loadView('pdf_view', $data);  
-        // return $pdf->download('medium.pdf');
-    }
+
+		// $pdf = PDF::loadView('print.pdf', $data);  
+		// return $pdf->download('medium.pdf');
+	}
 }

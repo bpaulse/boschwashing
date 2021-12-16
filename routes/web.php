@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventDetailController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\ClientController;
 
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
@@ -56,4 +57,11 @@ Route::get('registration', [CustomAuthController::class, 'registration'])->name(
 
 Route::get('pdf-create','pdfcontroller@create');
 
+Route::get('/print-invoice', [InvoiceController::class, 'printInvoice']);
+
 Route::get('/send-email', [MailController::class, 'sendMail']);
+
+Route::get('/getClientLineInfo', [ClientController::class, 'getClientLineInfo']);
+Route::get('/saveClientToInvoice', [ClientController::class, 'saveClientToInvoice']);
+
+Route::get('/deleteInvoiceLineData', [InvoiceLineController::class, 'deleteInvoiceLineData']);

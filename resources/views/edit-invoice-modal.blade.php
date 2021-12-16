@@ -11,28 +11,47 @@
 				<table class="table">
 					<tr>
 						<td>
-							<div class="form-group">
-								<label class="col-form-label" id="invoice_id"></label>
-							</div>
-						</td>
-						<td>
-							<div class="form-group">
-								<label class="col-form-label" id="created_date"></label>
-							</div>
+							<table style="width: 100%;">
+								<tr>
+									<td style="width: 20%; border: 0px solid black;">
+										<div class="form-group">
+											<label class="col-form-label" id="invoice_id"></label>
+										</div>
+									</td>
+									<td style="width: 60%; border: 0px solid black;">
+										<span style="font-size: 10px;" id="clientinfodisplay"></span>
+									</td>
+									<td style="text-align: right; width: 20%; border: 0px solid black;">
+										<div class="form-group">
+											<label class="col-form-label" id="created_date"></label>
+										</div>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr> 
 					<tr>
 						<form>
-							<td>
-								<div class="form-group">
-									<label for="invoice_name" class="col-form-label">Invoice Name:</label>
-									<input type="text" class="form-control" id="invoice_name" value="">
-								</div>
-							</td>
-							<td>
-								<div class="form-group">
-									<label for="invoice_desc" class="col-form-label">Invoice Desc:</label>
-									<input type="text" class="form-control" id="invoice_desc" value="">
+							<td style="text-align: center; width: 100%;">
+								<div class="container">
+									<div class="row">
+										<div class="form-group col-md-4">
+											<label for="invoice_name" class="col-form-label">Invoice Name:</label>
+											<input type="text" class="form-control" id="invoice_name" value="">
+										</div>
+
+										<div class="form-group col-md-4">
+											<label for="invoice_desc" class="col-form-label">Invoice Desc:</label>
+											<input type="text" class="form-control" id="invoice_desc" value="">
+										</div>
+
+										<div class="form-group col-md-4">
+											<label for="clientinfo" class="col-form-label">Client Info:</label>
+											<select id="clientinfo" class="form-control" style="width: 100%;">
+												<option selected>Choose...</option>
+											</select>
+										</div>
+									</div>
 								</div>
 							</td>
 							<input type="hidden" class="form-control" id="inv_id" value="">
@@ -64,7 +83,7 @@
 										Total - <span id="TotalDesc"></span>
 									</div>
 									<div style="float: right; width: 50%; height: 100%; border: 0px solid black; padding-top: 12%;">
-										<button class="btn btn-primary w-100 update-productline">Update</button>
+										<button class="btn btn-primary w-100 update-productline"></button>
 									</div>
 								</div>
 							</div>

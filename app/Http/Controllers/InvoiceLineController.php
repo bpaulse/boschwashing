@@ -10,13 +10,26 @@ class InvoiceLineController extends Controller
 {
 	private $currency = 'R';
 
-	public function UpdateInvoiceLine(Request $request) {
+	public function deleteInvoiceLineData (Request $request) {
 
-		// var_dump(
-		// 	$request->invoice_line_id, 
-		// 	$request->quantity, 
-		// 	$request->product_id
-		// );
+		$deletedRows = InvoiceLine::where('id', $request->ivlId)->delete();
+
+		if ( $deletedRows ) {
+			$msg = 'You have successfully deleted Invoice Line ID = ';
+			$code = 1;
+		} else {
+			$msg = 'something went wrong deleting the row with ID = ';
+			$code = 0;
+		}
+
+		return response()->json([
+			'code' => $code,
+			'msg' => $msg
+		]);
+
+	}
+
+	public function UpdateInvoiceLine(Request $request) {
 
 		if ( $request->invoice_line_id === NULL ) {
 
@@ -28,8 +41,26 @@ class InvoiceLineController extends Controller
 			$invoiceline->linetotal = $request->quantity * $this->getUnitprice($request->product_id);
 			$save = $invoiceline->save();
 
-			var_dump('save');
-			var_dump($save);
+			// var_dump('save');
+			// var_dump($save);
+
+			if ( $save ) {
+
+				$newTotal = $this->calculateNewTotal($invoiceline->invoice_id);
+
+				return response()->json([
+					'code' => 1,
+					'msg' => 'Invoice Line updated successfully!',
+					'data' => ['invoiceLine' => $invoiceline, 'products' => Product::all(), 'newTotal' => $newTotal ]
+				]);
+
+			} else {
+				return response()->json([
+					'code' => 0,
+					'msg' => 'Something went wrong.',
+					'data' => []
+				]);
+			}
 
 		} else {
 
@@ -48,27 +79,22 @@ class InvoiceLineController extends Controller
 
 		var_dump($save);
 
-		// $invoiceLine = InvoiceLine::find($request->invoice_line_id);	
-		// $invoiceLine->quantity = $request->quantity;
-		// $invoiceLine->product_id = $request->product_id;
-		// $save = $invoiceLine->save();
+		if ( $save ){ 
 
-		// if ( $save ){ 
+			$newTotal = $this->calculateNewTotal($invoiceLine->Invoice->id);
 
-		// 	$newTotal = $this->calculateNewTotal($invoiceLine->Invoice->id);
-
-		// 	return response()->json([
-		// 		'code' => 1,
-		// 		'msg' => 'Invoice Line updated successfully!',
-		// 		'data' => ['invoiceLine' => $invoiceLine, 'products' => Product::all(), 'newTotal' => $newTotal ]
-		// 	]);
-		// } else {
-		// 	return response()->json([
-		// 		'code' => 0,
-		// 		'msg' => 'Something went wrong.',
-		// 		'data' => null
-		// 	]);
-		// }
+			return response()->json([
+				'code' => 1,
+				'msg' => 'Invoice Line updated successfully!',
+				'data' => ['invoiceLine' => $invoiceLine, 'products' => Product::all(), 'newTotal' => $newTotal ]
+			]);
+		} else {
+			return response()->json([
+				'code' => 0,
+				'msg' => 'Something went wrong.',
+				'data' => null
+			]);
+		}
 
 	}
 
