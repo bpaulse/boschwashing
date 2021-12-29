@@ -19,7 +19,7 @@
 										</div>
 									</td>
 									<td style="width: 60%; border: 0px solid black;">
-										<span style="font-size: 10px;" id="clientinfodisplay"></span>
+										<span style="font-size: 12px;" id="clientinfodisplay"></span>
 									</td>
 									<td style="text-align: right; width: 20%; border: 0px solid black;">
 										<div class="form-group">
@@ -143,7 +143,6 @@
 		</div>
 	</div>
 </div>
-
 
 <div class="modal fade" id="deleteInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="deleteInvoiceModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">

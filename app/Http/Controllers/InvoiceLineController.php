@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\InvoiceLine;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Traits\CalcTrait;
 
 class InvoiceLineController extends Controller
 {
+	use CalcTrait;
 	private $currency = 'R';
 
 	public function deleteInvoiceLineData (Request $request) {
@@ -31,6 +33,12 @@ class InvoiceLineController extends Controller
 
 	public function UpdateInvoiceLine(Request $request) {
 
+		// 0 - save failure
+		// 1 - save success
+		// 2 - update failure
+		// 3 - update success
+
+
 		if ( $request->invoice_line_id === NULL ) {
 
 			$invoiceline = new InvoiceLine();
@@ -41,16 +49,15 @@ class InvoiceLineController extends Controller
 			$invoiceline->linetotal = $request->quantity * $this->getUnitprice($request->product_id);
 			$save = $invoiceline->save();
 
-			// var_dump('save');
-			// var_dump($save);
 
 			if ( $save ) {
 
 				$newTotal = $this->calculateNewTotal($invoiceline->invoice_id);
+				// var_dump($newTotal);
 
 				return response()->json([
 					'code' => 1,
-					'msg' => 'Invoice Line updated successfully!',
+					'msg' => 'Invoice Line saved successfully!',
 					'data' => ['invoiceLine' => $invoiceline, 'products' => Product::all(), 'newTotal' => $newTotal ]
 				]);
 
@@ -64,7 +71,7 @@ class InvoiceLineController extends Controller
 
 		} else {
 
-			$save = InvoiceLine::find($request->invoice_line_id)->update(
+			$update = InvoiceLine::find($request->invoice_line_id)->update(
 				[
 					'quantity' => $request->quantity,
 					'product_id' => $request->product_id,
@@ -72,29 +79,51 @@ class InvoiceLineController extends Controller
 				]
 			);
 
-			var_dump('update');
-			var_dump($save);
+			// var_dump('update');
+			// var_dump($update);
+
+			$invoiceline = InvoiceLine::find($request->invoice_line_id);
+
+			if ( $update ) {
+
+				$newTotal = $this->calculateNewTotal($request->invoice_id);
+				// var_dump($newTotal);
+
+				return response()->json([
+					'code' => 3,
+					'msg' => 'Invoice Line updated successfully!',
+					'data' => ['invoiceLine' => $invoiceline, 'products' => Product::all(), 'newTotal' => $newTotal ]
+				]);
+
+			} else {
+				return response()->json([
+					'code' => 2,
+					'msg' => 'Something went wrong.',
+					'data' => []
+				]);
+			}
+
 
 		}
 
-		var_dump($save);
+		// var_dump($save);
 
-		if ( $save ){ 
+		// if ( $save ){ 
 
-			$newTotal = $this->calculateNewTotal($invoiceLine->Invoice->id);
+		// 	$newTotal = $this->calculateNewTotal($invoiceLine->Invoice->id);
 
-			return response()->json([
-				'code' => 1,
-				'msg' => 'Invoice Line updated successfully!',
-				'data' => ['invoiceLine' => $invoiceLine, 'products' => Product::all(), 'newTotal' => $newTotal ]
-			]);
-		} else {
-			return response()->json([
-				'code' => 0,
-				'msg' => 'Something went wrong.',
-				'data' => null
-			]);
-		}
+		// 	return response()->json([
+		// 		'code' => 1,
+		// 		'msg' => 'Invoice Line updated successfully!',
+		// 		'data' => ['invoiceLine' => $invoiceLine, 'products' => Product::all(), 'newTotal' => $newTotal ]
+		// 	]);
+		// } else {
+		// 	return response()->json([
+		// 		'code' => 0,
+		// 		'msg' => 'Something went wrong.',
+		// 		'data' => null
+		// 	]);
+		// }
 
 	}
 

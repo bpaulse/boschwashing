@@ -11,73 +11,48 @@
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-	{{-- <link href="{{ asset('bootstrap/css//font-awesome.css') }}" rel="stylesheet"> --}}
 	<link href="{{ asset('select2/dist/css/select2.min.css') }}" rel='stylesheet' type='text/css'>	
 
-	<title>List of Invocies</title>
+	<title>List of Clients</title>
 </head>
 <body>
 
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
-			<div class="col-md-8">
+			<div class="col-md-12">
+				<div style="text-align: right; padding-bottom: 10px;">
+					<button class="btn btn-warning backToInvoiceList">Back</button>
+				</div>
 				<div class="card">
 					<div class="card-header">
-						{{-- <i class="icon-list"></i> Invoices --}}
 						<div style="float: left; width: 50%; border: 0px solid black;">
-							<i class="icon-list"></i> Invoices <span id="tableHeader"></span>
+							<i class="icon-list"></i> Clients <span id="tableHeader"></span>
 						</div>
 						<div style="float: right; width: 50%; border: 0px solid black; text-align: right;">
-							<span class="addClient"><img src="{{ asset('images/client.png') }}" style="width: 5%;"></span>
-							<span class="addProduct"><img src="{{ asset('images/add-product.png') }}" style="width: 5%;"></span>
+							<span class="addClient"><img src="{{ asset('images/add-icon.jpg') }}" style="width: 5%;"></span>
 						</div>
 					</div>
 					<div class="card-body">
 						<div class="table-responsive">
-							<table class="table table-hover table-condensed" id="invoices-table">
+							<table class="table table-hover table-condensed" id="client-table">
 								<thead>
-									<th>#</th>
-									<th>--</th>
-									<th>Name</th>
-									<th>Description</th>
+									<th>Company Name</th>
+									<th>Person Name & Surname</th>
+									<th>Mobile</th>
+									<th>Email</th>
 									<th>Action</th>
 								</thead>
-								<tbody id='tableData'></tbody>
+								<tbody id='clientTableData'></tbody>
 							</table>
 						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4">
-				<div class="card">
-					<div class="card-header">
-						<i class="icon-plus-sign-alt"></i> Add New Invoice
-					</div>
-					<div class="card-body">
-						<form action="{{ route('add.invoice') }}" method="POST" id="add-invoice-form">
-							@csrf
-							<div class="form-group">
-								<label for="">Invoices</label>
-								<input type="text" class="form-control" name="invoice_name" placeholder="Please Enter an Invoice Name..." />
-								<span class="text-danger error-text invoice_name_error"></span>
-							</div>
-							<div class="form-group">
-								<label for="">Invoice Desciption</label>
-								<input type="text" class="form-control" name="invoice_desc" placeholder="Please enter an Invoice Description..." />
-								<span class="text-danger error-text invoice_desc_error"></span>
-							</div>
-							<div class="form-group">
-								<button class="btn btn-block btn-success" type="submit">SAVE</button>
-							</div>
-						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	@include('edit-invoice-modal');
-	@include('product-modal');
+	{{-- @include('add-client-modal'); --}}
+	@include('edit-client-modal');
 
 	<script src="{{ asset('jquery/jquery-3.6.0.min.js') }}"></script>
 	<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
@@ -86,7 +61,7 @@
 	<script src="{{ asset('sweetalert2/sweetalert2.min.js') }}"></script>
 	<script src="{{ asset('toastr/toastr.min.js') }}"></script>
 
-	<script type="text/javascript" src="{{ asset('js/index.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/clientlist.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('select2/dist/js/select2.min.js') }}" ></script>
 
 

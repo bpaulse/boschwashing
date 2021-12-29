@@ -8,6 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventDetailController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
@@ -62,6 +63,12 @@ Route::get('/print-invoice', [InvoiceController::class, 'printInvoice']);
 Route::get('/send-email', [MailController::class, 'sendMail']);
 
 Route::get('/getClientLineInfo', [ClientController::class, 'getClientLineInfo']);
+Route::get('/getClient', [ClientController::class, 'getClient']);
 Route::get('/saveClientToInvoice', [ClientController::class, 'saveClientToInvoice']);
 
 Route::get('/deleteInvoiceLineData', [InvoiceLineController::class, 'deleteInvoiceLineData']);
+
+Route::get('/client-list', [ClientController::class, 'index'])->name('client.list');
+Route::post('/edit-client', [ClientController::class, 'editClient'])->name('edit.client');
+
+Route::get('/getProductServicesList', [ProductController::class, 'getProductServicesList']);
