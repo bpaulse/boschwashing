@@ -13,7 +13,7 @@
 						<td>
 							<div class="form-row" id="productform">
 								<div class="form-group col-md-12" style="text-align: right;">
-									<span class="close-line-item">X</span>
+									<span class="close-product-div">&times;</span>
 								</div>
 								<div class="form-group col-md-4">
 									<label for="product_name">Product Name</label>
@@ -22,10 +22,11 @@
 								<div class="form-group col-md-4" style="border: blue 0px solid;">
 									<label for="unitprice">Unit Price</label>
 									<input type="text" class="form-control" id="unitprice" value="">
+									<input type="hidden" id="product_id" value="">
 								</div>
 								<div class="form-group col-md-4">
 									<div style="float: right; width: 50%; height: 100%; border: 0px solid black; padding-top: 12%;">
-										<button class="btn btn-primary w-100 update-productline">Add</button>
+										<button class="btn btn-primary w-100 submit-product"></button>
 									</div>
 								</div>
 							</div>

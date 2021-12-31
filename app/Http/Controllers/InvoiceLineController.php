@@ -38,8 +38,13 @@ class InvoiceLineController extends Controller
 		// 2 - update failure
 		// 3 - update success
 
+		// var_dump('invoice_line_id: ');
+		// var_dump($request->invoice_line_id);
+		
 
-		if ( $request->invoice_line_id === NULL ) {
+		if ( $request->invoice_line_id == 0 ) {
+
+			// var_dump('new');
 
 			$invoiceline = new InvoiceLine();
 			$invoiceline->quantity = $request->quantity;
@@ -47,6 +52,7 @@ class InvoiceLineController extends Controller
 			$invoiceline->product_id = $request->product_id;
 
 			$invoiceline->linetotal = $request->quantity * $this->getUnitprice($request->product_id);
+
 			$save = $invoiceline->save();
 
 
@@ -71,6 +77,8 @@ class InvoiceLineController extends Controller
 
 		} else {
 
+			// var_dump('update');
+
 			$update = InvoiceLine::find($request->invoice_line_id)->update(
 				[
 					'quantity' => $request->quantity,
@@ -79,15 +87,11 @@ class InvoiceLineController extends Controller
 				]
 			);
 
-			// var_dump('update');
-			// var_dump($update);
-
 			$invoiceline = InvoiceLine::find($request->invoice_line_id);
 
 			if ( $update ) {
 
 				$newTotal = $this->calculateNewTotal($request->invoice_id);
-				// var_dump($newTotal);
 
 				return response()->json([
 					'code' => 3,
@@ -176,8 +180,7 @@ class InvoiceLineController extends Controller
 
 	public function getInvoiceLineDetails(Request $request) {
 
-		$invoice_id = $request->inv_id;
-		$invoicelines = InvoiceLine::where('invoice_id', $invoice_id)->get();
+		$invoicelines = InvoiceLine::where('invoice_id', $request->inv_id)->get();
 		$data = $this->buildInvoiceLines($invoicelines);
 		return response()->json($data);
 

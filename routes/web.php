@@ -72,3 +72,6 @@ Route::get('/client-list', [ClientController::class, 'index'])->name('client.lis
 Route::post('/edit-client', [ClientController::class, 'editClient'])->name('edit.client');
 
 Route::get('/getProductServicesList', [ProductController::class, 'getProductServicesList']);
+
+Route::post('/updateProductLine', [ProductController::class, 'updateProductLine']);
+Route::get('/deleteProduct', [ProductController::class, 'deleteProduct']);

@@ -9,6 +9,8 @@ class Product extends Model
 {
 	use HasFactory;
 
+	protected $fillable = ['product_name', 'unitprice', 'user_id'];
+
 	public function invoiceline() {
 		return $this->belongsTo(InvoiceLine::class);
 	}
