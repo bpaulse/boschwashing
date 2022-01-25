@@ -8,6 +8,7 @@
 				</button>
 			</div>
 			<div class="modal-body">
+				<div class="invoice-update-status"></div>
 				<table class="table">
 					<tr>
 						<td>
@@ -37,12 +38,12 @@
 									<div class="row">
 										<div class="form-group col-md-4">
 											<label for="invoice_name" class="col-form-label">Invoice Name:</label>
-											<input type="text" class="form-control" id="invoice_name" value="">
+											<input type="text" class="form-control" id="invoice_name" data-name="name" value="">
 										</div>
 
 										<div class="form-group col-md-4">
 											<label for="invoice_desc" class="col-form-label">Invoice Desc:</label>
-											<input type="text" class="form-control" id="invoice_desc" value="">
+											<input type="text" class="form-control" id="invoice_desc" data-name="desc" value="">
 										</div>
 
 										<div class="form-group col-md-4">

@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-	<link href="{{ asset('select2/dist/css/select2.min.css') }}" rel='stylesheet' type='text/css'>	
+	<link href="{{ asset('select2/dist/css/select2.min.css') }}" rel='stylesheet' type='text/css'>
 
 	<title>List of Clients</title>
 </head>
@@ -44,6 +44,9 @@
 								</thead>
 								<tbody id='clientTableData'></tbody>
 							</table>
+							<div id="pager">
+								<ul id="pagination" class="pagination-sm"></ul>
+						  </div>
 						</div>
 					</div>
 				</div>
@@ -51,7 +54,7 @@
 		</div>
 	</div>
 
-	{{-- @include('add-client-modal'); --}}
+	@include('add-client-modal');
 	@include('edit-client-modal');
 
 	<script src="{{ asset('jquery/jquery-3.6.0.min.js') }}"></script>
@@ -64,7 +67,7 @@
 	<script type="text/javascript" src="{{ asset('js/clientlist.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('select2/dist/js/select2.min.js') }}" ></script>
 
-
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twbs-pagination/1.4.1/jquery.twbsPagination.min.js" ></script>
 
 </body>
 </html>

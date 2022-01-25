@@ -9,6 +9,7 @@ use App\Http\Controllers\EventDetailController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\pdfController;
 
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
@@ -41,6 +42,7 @@ Route::get('/getEventName', [EventController::class, 'getEventName']);
 Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
 Route::post('/add-score', [EventDetailController::class, 'addScore'])->name('add.score');
 Route::post('/add-athlete', [EventDetailController::class, 'addAthlete'])->name('add.athlete');
+Route::post('/add-client', [ClientController::class, 'addClient'])->name('add.client');
 
 Route::get('/getWODDesc', [EventDetailController::class, 'getWODDesc']);
 Route::get('/wodDetails/{id}/{wodid}', [EventDetailController::class, 'wodDetails']);
@@ -56,10 +58,9 @@ Route::get('registration', [CustomAuthController::class, 'registration'])->name(
 // Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('register.custom'); 
 // Route::get('signout', [CustomAuthController::class, 'signOut'])->name('signout');
 
-Route::get('pdf-create','pdfcontroller@create');
+Route::get('/pdf-create', [pdfController::class, 'create']);
 
 Route::get('/print-invoice', [InvoiceController::class, 'printInvoice']);
-
 Route::get('/send-email', [MailController::class, 'sendMail']);
 
 Route::get('/getClientLineInfo', [ClientController::class, 'getClientLineInfo']);
@@ -75,3 +76,7 @@ Route::get('/getProductServicesList', [ProductController::class, 'getProductServ
 
 Route::post('/updateProductLine', [ProductController::class, 'updateProductLine']);
 Route::get('/deleteProduct', [ProductController::class, 'deleteProduct']);
+
+Route::get('/buildAndSendInvoice', [InvoiceController::class, 'buildAndSendInvoice']);
+
+Route::get('/updateSingleInvoiceField', [InvoiceController::class, 'updateSingleInvoiceField']);

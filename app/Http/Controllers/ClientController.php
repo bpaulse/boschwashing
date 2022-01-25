@@ -11,17 +11,56 @@ class ClientController extends Controller
 {
 
 	public function index () {
+		// $user_id = 1;
+		// $client = Client::paginate(5);
+		// return view('client-list',compact('client'));
 		return view('client-list');
 	}
 
 	public function getClientLineInfo(Request $request) {
-		$clients = Client::where('user_id', $request->user_id)->get();
+
+		$user_id = 1;
+
+		$clients = Client::where('user_id', $user_id)->get();
+		// $clients = Client::where('user_id', $request->user_id)->get();
 		return response()->json($clients);
+	}
+
+	public function addClient (Request $request) {
+
+		$client = new Client();
+
+		$client->name			= $request->name;
+		$client->surname 		= $request->surname;
+		$client->mobile 		= $request->mobile;
+		$client->email 			= $request->email;
+		$client->website 		= $request->website;
+		$client->landline 		= $request->landline;
+		$client->vat 			= $request->vat;
+		$client->companyreg 	= $request->companyreg;
+		$client->companyname 	= $request->companyname;
+		$client->address 		= $request->address;
+		$client->user_id 		= $request->user_id;
+
+		$save = $client->save();
+
+		if ( $save ) {
+			$return = ['code' => 1, 'msg' => 'Client added successfully!', 'data' => $client];
+		} else {
+			$return = ['code' => 0, 'msg' => 'Error add Client', 'data' => []];
+		}
+
+		return response()->json($return);
+
+
 	}
 
 	public function editClient (Request $request) {
 
+		// var_dump($request->name);
+		// var_dump($request->id);
 		$client = Client::find($request->id);
+		// var_dump($client);exit();
 
 		$client->name			= $request->name;
 		$client->surname 		= $request->surname;
@@ -46,9 +85,7 @@ class ClientController extends Controller
 	}
 
 	public function getClient(Request $request) {
-		// var_dump($request->clientid);
 		$clients = Client::where('id', $request->clientid)->get();
-		// var_dump($clients);
 		return response()->json($clients[0]);
 	}
 

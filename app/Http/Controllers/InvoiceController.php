@@ -5,16 +5,68 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\InvoiceClient;
+use App\Http\Controllers\pdfController;
 use Illuminate\Support\Facades\Validator;
 // use Yajra\DataTables\Facades\DataTables;
-
-use PDF;
+// use PDF;
 
 class InvoiceController extends Controller
 {
 	public function index () {
 		return view('invoice-list');
 	}
+
+	public function buildAndSendInvoice (Request $request) {
+
+		$invoice_id = $request->invoiceid;
+		$updateArr = [ 'status' => 1 ];
+
+		// now update the status of the invoice to sent
+		$update = Invoice::where('id', $invoice_id)->update($updateArr);
+
+		if ( $update ) {
+
+			$pdf = new pdfController();
+			$return = $pdf->create($invoice_id);
+
+			// if ( $return['code'] === 1 ) {
+			// 	return response()->json(['code' => $return['code'], 'msg' => $return['msg'], 'data' => $invoice_id ]);
+			// } else {
+			// 	return response()->json(['code' => $return['code'], 'msg' => $return['msg'] ]);
+			// }
+
+		} else {
+			return response()->json(['code' => 2, 'msg' => 'Failure sending Invoice...']);
+		}
+
+
+		// 	if ( $update ) {
+		// 		return response()->json(['code' => $return['code'], 'msg' => $return['msg'], 'data' => $update]);
+		// 	} else {
+		// 		return response()->json(['code' => $return
+		// 		, 'msg' => $return['msg']]);
+		// 	}
+
+		// }
+
+	}
+
+	public function updateSingleInvoiceField (Request $request) {
+
+		$updateArr = [
+			'invoice_' . $request->type => $request->fieldValue
+		];
+
+		$update = Invoice::find($request->invoice_id)->update($updateArr);
+
+		if ( $update ) {
+			return response()->json(['code' => 1, 'msg' => 'Invoice ' . $request->type . ' updated successfully...']);
+		} else {
+			return response()->json(['code' => 0, 'msg' => 'Something went wrong with the updated...']);
+		}
+
+	}
+
 
 	public function addInvoice(Request $request) {
 

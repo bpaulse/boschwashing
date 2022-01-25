@@ -3,25 +3,32 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use PDF;
+use App\Mail\SystemMail;
+use App\Models\InvoiceLine;
+use Illuminate\Support\Facades\Mail;
 
-class pdfcontroller extends Controller
+class pdfController extends Controller
 {
-    public function create()
-    {
-    	$data = ['title' => 'Laravel 7 Generate PDF From View Example Tutorial'];
-        $pdf = PDF::loadView('pdf', $data);
-        // return $pdf->download('Nicesnippets.pdf');
+	public function create($invoice_id) {
 
-        // $pdf = PDF::loadView('pdf.invoice', $data);
-        // Storage::put('public/pdf/invoice.pdf', $pdf->output());
-        // return $pdf->download('invoice.pdf');
+		var_dump($invoice_id);
+		$this->data['item'] = InvoiceLine::where('invoice_id', $invoice_id)->get();
+		$obj = $this->data['item'];
+		// var_dump($obj);
 
-        $path = public_path('pdf/');
+		foreach ( $obj as $item ) {
+			print_r($item);
 
-        // $fileName =  $post['title'] . '.' . 'pdf' ;
-        $fileName =  'invoice' . '.' . 'pdf' ;
-        $pdf->save($path . '/' . $fileName);
-        return $pdf->download($fileName);
+			$item['id'];
+			$item['quantity'];
+			$item['linetotal'];
+			$item['created_at'];
+			$item['updated_at'];
+			$item['invoice_id'];
+			$item['product_id'];
 
-    }
+		}
+
+
+	}
 }

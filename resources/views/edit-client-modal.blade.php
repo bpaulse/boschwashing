@@ -8,7 +8,9 @@
 				</button>
 			</div>
 
-			<form action="{{ route('edit.client') }}" method="POST" id="edit-client-form">
+
+
+			<form action="{{ route('edit.client') }}" method="POST" id="edit-client-form" name="edit-client-form">
 				<div class="modal-body">
 					<table class="table">
 						@csrf
@@ -16,7 +18,7 @@
 							<td>
 								<div class="form-group">
 									<label for="name" class="col-form-label">Name:</label>
-									<input type="text" class="form-control" id="name" value="">
+									<input type="text" class="form-control" id="name" value="Bevan">
 								</div>
 							</td>
 							<td>
@@ -83,35 +85,12 @@
 								</div>
 							</td>
 						</tr>
-						{{-- <tr>
-							<td>
-								<div class="form-group">
-									<label for="athlete_type" class="col-form-label">Category:</label>
-									<select class="form-control" id="athlete_type">
-										<option>-----</option>
-										<option value="4">RX</option>
-										<option value="5">Intermediate</option>
-										<option value="6">Beginner</option>
-									</select>
-								</div>
-							</td>
-							<td>
-								<div class="form-group">
-									<label for="gender" class="col-form-label">Gender:</label>
-									<select class="form-control" id="gender">
-										<option>-----</option>
-										<option value="7">Female</option>
-										<option value="8">Male</option>
-										<option value="9">Mixed</option>
-									</select>
-								</div>
-							</td>
-						</tr> --}}
+
 					</table>
 
 				</div>
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary editClientSubmit">Submit</button>
+					<button type="submit" class="btn btn-primary editClientSubmit">Update</button>
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				</div>
 			</form>

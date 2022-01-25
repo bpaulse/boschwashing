@@ -16,26 +16,13 @@
 								<div class="form-group">
 									<label for="wod_desc" class="col-form-label">WOD Desc:</label>
 									<div id="woddescinfo"></div>
-									{{-- <textarea class="form-control z-depth-1" id="wod_desc" rows="5" placeholder="Write something here..."></textarea> --}}
 								</div>
 							</td>
 							<input type="hidden" id="wod_id" value="">
 						</tr>
 						<tr>
-							<td style="width: 100%; border: 0px solid black; padding-top: 19px;" id="fortime">
-								<div class="form-row">
-									<div class="form-group col-md-2">
-										<label for="minutes">Min</label>
-										<input type="text" class="form-control" id="minutes">
-									</div>
-									<div class="form-group col-md-2">
-										<label for="secondes">Sec</label>
-										<input type="text" class="form-control" id="secondes">
-									</div>
-								</div>
-							</td>
-							<td style="width: 50%; border: 0px solid black;">
-							</td>
+							<td style="width: 100%; padding-top: 19px;" id="scoringtype"></td>
+							<td style="width: 50%; border: 0px solid black;"></td>
 						</tr>
 
 					</table>

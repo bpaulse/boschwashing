@@ -9,14 +9,10 @@ $(document).ready(function(){
 	var wodid = chunks[chunks.length-1];
 	var eventid = chunks[chunks.length-2];
 
-	console.log('wodid');
-	console.log(wodid);
-
 	loadAthletes(eventid);
 
 	$(document).on('click', '.backEventDetails', function(evt){
 		console.log('backeventdetails');
-		// window.location.href = '/wodDetails/' + eventid + '/' + wodid;
 		window.location.href = '/displayEventDetails/' + eventid;
 	});
 
@@ -28,29 +24,40 @@ $(document).ready(function(){
 		console.log(wodid);
 		$('#wod_id').val(wodid);
 
-		var woddesc = getWODDesc(wodid);
-
-		console.log(woddesc);
-
-		$('#woddescinfo').html(woddesc);
+		getWODDesc(wodid);
 
 	});
 
+	// search-athlete
 	$("#athlete_search").keyup(function() {
 
 		var event_id = 1;
-
 		var dInput = $(this).val();
-		console.log(dInput);
+		var ajaxData = { eventid: event_id, searchterm: dInput };
 
 		$.ajax({
 			type: 'GET',
 			url: '/searchAthlete',
-			data: { eventid: event_id, searchterm: dInput},
+			data: ajaxData,
 			dataType: 'json',
 			contentType: false,
-			sucess: function(response) {
-				console.log(response);
+			success: function(response) {
+
+				// console.log('response');
+				console.log(response.data);
+
+				// $('#athleteData').html('');
+				$('#athleteData').empty();
+
+				// // populate list
+				var output = '';
+				$.each(response.data, function(data1,data2){
+					var row = athleteRow({'id': data2.id, 'name': data2.Name + ' ' + data2.Surname, 'category': data2.athleteDivision, 'gender': data2.gender});
+					output += row;
+				});
+
+				$('#athleteData').html(output);
+
 			}
 		})
 
@@ -205,24 +212,84 @@ $(document).ready(function(){
 
 });
 
+function roundsfortime () {
+
+	let output = '';
+
+	output =+ '<div class="form-row">';
+	output =+ '<div class="form-group col-md-2">';
+	output =+ '<label for="minutes">Min</label>';
+	output =+ '<input type="text" class="form-control" id="minutes">';
+	output =+ '</div>';
+	output =+ '<div class="form-group col-md-2">';
+	output =+ '<label for="secondes">Sec</label>';
+	output =+ '<input type="text" class="form-control" id="secondes">';
+	output =+ '</div>';
+	output =+ '</div>';
+
+	return output;
+
+}
+
+function rft() {
+	let output = '';
+
+	output =+ '<div class="form-row">';
+	output =+ '<div class="form-group col-md-4">';
+	output =+ '<label for="Reps">RFT</label>';
+	output =+ '<input type="text" class="form-control" id="Reps">';
+	output =+ '</div>';
+	output =+ '</div>';
+	return output;
+}
+
+function onerm() {
+	let output = '';
+
+	output =+ '<div class="form-row">';
+	output =+ '<div class="form-group col-md-4">';
+	output =+ '<label for="onerepmax">1RM</label>';
+	output =+ '<input type="text" class="form-control" id="onerepmax">';
+	output =+ '</div>';
+	output =+ '</div>';
+	return output;
+}
+
+
+
 function getWODDesc(wodid) {
-	console.log(wodid);
 
 	$.ajax({
 		type: 'GET',
 		url: '/getWODDesc',
 		data: {wodid: wodid},
 		dataType: 'json',
-		contentType: false,
-		sucess: function(response) {
-			console.log(response);
+		success: function(wod) {
+			console.log(wod);
+			$('#woddescinfo').html(wod.woddesc);
+
+			(wod.wodtype)
+
+			// 1 - AMRAP 
+			// 2 - For Time 
+			// 3 - 1 RM
+
+			if ( wod.wodtype === 1 ) {
+				$('#scoringtype').html( rft() );
+			} else if ( wod.wodtype === 2 ) {
+				$('#scoringtype').html( rft() );
+			} else if ( wod.wodtype === 2 ) {
+				$('#scoringtype').html( rft() );
+			}
+
 		}
 	})
+
 }
 
 function loadAthletes(eventid) {
 
-	console.log('loadAthletes');
+	// console.log('loadAthletes');
 
 	$.ajax({
 		type: 'GET',
@@ -232,17 +299,11 @@ function loadAthletes(eventid) {
 		contentType: false,
 		success: function (response) {
 
-			console.log(response);
-
 			var output = '';
-			// if ( response.count === 0 ) {
-			// 	output = athleteRowNoData();
-			// } else {
 			$.each(response, function(data1,data2){
 				var row = athleteRow({'id': data2.id, 'name': data2.Name + ' ' + data2.Surname, 'category': data2.athleteDivision, 'gender': data2.gender});
 				output += row;
 			});
-			// }
 
 			$('#athleteData').html(output);
 		},

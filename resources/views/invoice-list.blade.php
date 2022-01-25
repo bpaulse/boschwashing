@@ -11,7 +11,6 @@
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-	{{-- <link href="{{ asset('bootstrap/css//font-awesome.css') }}" rel="stylesheet"> --}}
 	<link href="{{ asset('select2/dist/css/select2.min.css') }}" rel='stylesheet' type='text/css'>	
 
 	<title>List of Invocies</title>
@@ -23,7 +22,6 @@
 			<div class="col-md-8">
 				<div class="card">
 					<div class="card-header">
-						{{-- <i class="icon-list"></i> Invoices --}}
 						<div style="float: left; width: 50%; border: 0px solid black;">
 							<i class="icon-list"></i> Invoices <span id="tableHeader"></span>
 						</div>
@@ -33,6 +31,7 @@
 						</div>
 					</div>
 					<div class="card-body">
+						<div id="loading-div"><img width="70px" src="{{ asset('images/loader.gif') }}" /></div>
 						<div class="table-responsive">
 							<table class="table table-hover table-condensed" id="invoices-table">
 								<thead>

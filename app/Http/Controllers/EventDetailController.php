@@ -30,9 +30,10 @@ class EventDetailController extends Controller {
 	}
 	
 	public function searchAthlete (Request $request) {
+
 		$eventid = $request->input('eventid');
 		$searchterm = $request->input('searchterm');
-		var_dump($eventid, $searchterm);
+
 		$athletes = DB::select("
 			SELECT 
 				ath.id, 
@@ -55,11 +56,16 @@ class EventDetailController extends Controller {
 			ON 
 				ath.event_id = eve.id 
 			WHERE ath.event_id = ? 
-			AND (ath.Name LIKE ?) 
+			AND (ath.Name LIKE ? OR ath.Surname LIKE ? OR gen.settingdesc LIKE ? OR athtype.settingdesc LIKE ?) 
 			ORDER 
-				BY gen.id, athtype.id", [$eventid, '%'.$searchterm.'%']);
-		// $athletes = DB::select("SELECT ath.id, ath.Name, ath.Surname, ath.email, gen.settingdesc as 'gender', athtype.settingdesc as 'athleteDivision', eve.event_name FROM `athletes` as ath INNER JOIN settings as gen ON ath.gender = gen.id INNER JOIN settings as athtype ON ath.athletetype = athtype.id INNER JOIN events as eve ON ath.event_id = eve.id WHERE ath.event_id = ? AND ( ath.Name OR ath.Surname OR ath.email) ORDER BY gen.id, athtype.id", [$eventid, ]);
-		return response()->json($athletes);
+				BY gen.id, athtype.id", [$eventid, '%'.$searchterm.'%', '%'.$searchterm.'%', '%'.$searchterm.'%', '%'.$searchterm.'%'
+		]);
+
+		// var_dump($athletes);
+
+		$response = ['data' => $athletes];
+		
+		return response()->json($response);
 	}
 
 	public function addWod (Request $request) {
@@ -165,13 +171,8 @@ class EventDetailController extends Controller {
 
 	public function getWODDesc (Request $request) {
 
-		$wodid = $request->input('wodid');
-
-		// var_dump('wodid: ');
-		// var_dump($wodid);
-
-		$wod = Wod::select('*');
-
+		$id = $request->input('wodid');
+		$wod = Wod::select('*')->where('id', $id)->firstOrFail();
 		return response()->json($wod);
 
 	}

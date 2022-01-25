@@ -19,7 +19,6 @@ class SystemMail extends Mailable
 	 * @return void
 	 */
 	public function __construct($details) {
-		//
 		$this->details = $details;
 	}
 
@@ -28,12 +27,11 @@ class SystemMail extends Mailable
 	 *
 	 * @return $this
 	 */
-	public function build()
-	{
+	public function build() {
 
-		return $this->subject('Test Mail from Bevan')
-		->view('emails.TestMail')
-		->attach('pdf/invoice.pdf');
+		// $this->details['title'];
+		// return $this->subject('Test Mail from Bevan')->view('emails.TestMail')->attach('pdf/invoice.pdf');
+		return $this->subject($this->details['title'])->view('emails.TestMail')->attach('pdf/' . $this->details['attachment']);
 
 		// ->attachFromStorage(
 		// 	public_path('pdf/'), 
