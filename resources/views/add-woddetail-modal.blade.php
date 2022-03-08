@@ -2,7 +2,7 @@
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="wodScoreModalLabel"><i class="icon-cog"></i> Enter WOD Score for </h5>
+				<h5 class="modal-title" id="wodScoreModalLabel"><i class="icon-cog"></i> Enter WOD Score for <i id="athleteName"></i></h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
@@ -21,7 +21,9 @@
 							<input type="hidden" id="wod_id" value="">
 						</tr>
 						<tr>
-							<td style="width: 100%; padding-top: 19px;" id="scoringtype"></td>
+							<td style="width: 100%; padding-top: 19px;">
+								<span id="scoringtype"></span>
+							</td>
 							<td style="width: 50%; border: 0px solid black;"></td>
 						</tr>
 

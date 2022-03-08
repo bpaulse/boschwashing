@@ -17,23 +17,12 @@
 
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
-			{{-- <div class="w-25 text-left p-3">
-				<div class="form-group">
-					<select class="form-control" id="athlete_type">
-						<option>-----</option>
-						<option value="4">RX</option>
-						<option value="5">Intermediate</option>
-						<option value="6">Beginner</option>
-					</select>
-				</div> 
-			</div> --}}
 			<div class="w-25 text-left p-3">
 				<div class="form-group">
 					<input type="text" class="form-control" id="athlete_search" value="" placeholder="Search">
 				</div>
 			</div>
 			<div class="w-25 text-left p-3">
-				 {{-- <button class="btn btn-success search-athlete">Search</button> --}}
 			</div>
 			<div class="w-50 text-right p-3">
 				<button class="btn btn-info text-right backEventDetails">Back</button>

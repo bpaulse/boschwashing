@@ -17,14 +17,12 @@ $(document).ready(function(){
 	});
 
 	$(document).on('click', '.insertScores', function(evt){
-		console.log('enter wod scores');
+
+		console.log($(this).closest('tr').attr('data-id'));
+
 		$('#wodScoreModal').modal('show');
-
-		// set wodid on modal
-		console.log(wodid);
-		$('#wod_id').val(wodid);
-
-		getWODDesc(wodid);
+		// $('#wod_id').val(wodid);
+		// getWODDesc(wodid);
 
 	});
 
@@ -216,16 +214,16 @@ function roundsfortime () {
 
 	let output = '';
 
-	output =+ '<div class="form-row">';
-	output =+ '<div class="form-group col-md-2">';
-	output =+ '<label for="minutes">Min</label>';
-	output =+ '<input type="text" class="form-control" id="minutes">';
-	output =+ '</div>';
-	output =+ '<div class="form-group col-md-2">';
-	output =+ '<label for="secondes">Sec</label>';
-	output =+ '<input type="text" class="form-control" id="secondes">';
-	output =+ '</div>';
-	output =+ '</div>';
+	output = output + '<div class="form-row">';
+	output = output + '<div class="form-group col-md-2">';
+	output = output + '<label for="minutes">Min</label>';
+	output = output + '<input type="text" class="form-control" id="minutes">';
+	output = output + '</div>';
+	output = output + '<div class="form-group col-md-2">';
+	output = output + '<label for="secondes">Sec</label>';
+	output = output + '<input type="text" class="form-control" id="secondes">';
+	output = output + '</div>';
+	output = output + '</div>';
 
 	return output;
 
@@ -234,28 +232,27 @@ function roundsfortime () {
 function rft() {
 	let output = '';
 
-	output =+ '<div class="form-row">';
-	output =+ '<div class="form-group col-md-4">';
-	output =+ '<label for="Reps">RFT</label>';
-	output =+ '<input type="text" class="form-control" id="Reps">';
-	output =+ '</div>';
-	output =+ '</div>';
+	output = output + '<div class="form-row">';
+	output = output + '<div class="form-group col-md-4">';
+	output = output + '<label for="Reps">RFT</label>';
+	output = output + '<input type="text" class="form-control" id="Reps">';
+	output = output + '</div>';
+	output = output + '</div>';
 	return output;
 }
 
 function onerm() {
 	let output = '';
 
-	output =+ '<div class="form-row">';
-	output =+ '<div class="form-group col-md-4">';
-	output =+ '<label for="onerepmax">1RM</label>';
-	output =+ '<input type="text" class="form-control" id="onerepmax">';
-	output =+ '</div>';
-	output =+ '</div>';
+	output = output + '<div class="form-row">';
+	output = output + '<div class="form-group col-md-4">';
+	output = output + '<label for="onerepmax">1RM</label>';
+	output = output + '<input type="text" class="form-control" id="onerepmax">';
+	output = output + '</div>';
+	output = output + '</div>';
 	return output;
 }
-
-
+// $(this).closest('tr').attr('id');
 
 function getWODDesc(wodid) {
 
@@ -265,21 +262,24 @@ function getWODDesc(wodid) {
 		data: {wodid: wodid},
 		dataType: 'json',
 		success: function(wod) {
-			console.log(wod);
-			$('#woddescinfo').html(wod.woddesc);
 
-			(wod.wodtype)
+			$('#woddescinfo').html(wod.woddesc);
 
 			// 1 - AMRAP 
 			// 2 - For Time 
 			// 3 - 1 RM
 
-			if ( wod.wodtype === 1 ) {
+			// get the name of the athlete
+
+			console.log('type');
+			console.log(wod.wodtype);
+
+			if ( wod.wodtype == 1 ) {
+				$('#scoringtype').html( roundsfortime() );
+			} else if ( wod.wodtype == 2 ) {
 				$('#scoringtype').html( rft() );
-			} else if ( wod.wodtype === 2 ) {
-				$('#scoringtype').html( rft() );
-			} else if ( wod.wodtype === 2 ) {
-				$('#scoringtype').html( rft() );
+			} else if ( wod.wodtype == 3 ) {
+				$('#scoringtype').html( onerm() );
 			}
 
 		}
@@ -288,8 +288,6 @@ function getWODDesc(wodid) {
 }
 
 function loadAthletes(eventid) {
-
-	// console.log('loadAthletes');
 
 	$.ajax({
 		type: 'GET',
@@ -311,9 +309,7 @@ function loadAthletes(eventid) {
 			console.log(e);
 		}
 	});
-
 }
-
 
 function athleteRow (athlete) {
 	return '<tr data-id="'+ athlete.id +'"><th>' + athlete.name + '</th><th>' + athlete.category + '</th><th>' + athlete.gender  + '</th><th>' + editAndSaveButtons('') + '</th></tr>';

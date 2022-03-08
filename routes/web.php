@@ -10,6 +10,7 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\pdfController;
+use App\Http\Controllers\SendMailController;
 
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
@@ -80,3 +81,4 @@ Route::get('/deleteProduct', [ProductController::class, 'deleteProduct']);
 Route::get('/buildAndSendInvoice', [InvoiceController::class, 'buildAndSendInvoice']);
 
 Route::get('/updateSingleInvoiceField', [InvoiceController::class, 'updateSingleInvoiceField']);
+Route::get('/send/mail', [SendMailController::class, 'send_mail'])->name('send_mail');

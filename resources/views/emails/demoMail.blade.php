@@ -8,9 +8,9 @@
 </head>
 <body>
 
-	<h1>Title</h1>
-	<h3>body']}}</h3>
-	<h4>Thank You</h4>
+	<h1>Title of the Email</h1>
+	<p>Body of the Email</p>
+	<p>Thank You</p>
 
 </body>
 </html>

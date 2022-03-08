@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\InvoiceClient;
+use App\Models\Client;
 use App\Http\Controllers\pdfController;
 use Illuminate\Support\Facades\Validator;
-// use Yajra\DataTables\Facades\DataTables;
-// use PDF;
+
+use App\Http\Controllers\SendMailController;
 
 class InvoiceController extends Controller
 {
@@ -26,8 +27,18 @@ class InvoiceController extends Controller
 
 		if ( $update ) {
 
-			$pdf = new pdfController();
-			$return = $pdf->create($invoice_id);
+			$invoiceclient = InvoiceClient::where('invoice_id', $invoice_id)->firstOrFail();
+
+			$client = Client::where('id', $invoiceclient->client_id)->firstOrFail();
+
+			$data = [
+				'invoice_id' => $invoice_id,
+				'name' => $client->name . ' ' . $client->surname,
+				'email' => $client->email
+			];
+
+			$sendMail = new SendMailController();
+			$sendMail->send_mail($data);
 
 			// if ( $return['code'] === 1 ) {
 			// 	return response()->json(['code' => $return['code'], 'msg' => $return['msg'], 'data' => $invoice_id ]);
@@ -38,16 +49,6 @@ class InvoiceController extends Controller
 		} else {
 			return response()->json(['code' => 2, 'msg' => 'Failure sending Invoice...']);
 		}
-
-
-		// 	if ( $update ) {
-		// 		return response()->json(['code' => $return['code'], 'msg' => $return['msg'], 'data' => $update]);
-		// 	} else {
-		// 		return response()->json(['code' => $return
-		// 		, 'msg' => $return['msg']]);
-		// 	}
-
-		// }
 
 	}
 

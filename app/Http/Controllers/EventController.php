@@ -75,11 +75,6 @@ class EventController extends Controller
 			var_dump($validator->errors()->toArray());
 		}
 
-		// $event = Event::find($request->invoice_line_id);
-		// $invoiceLine->quantity = $request->quantity;
-		// $invoiceLine->product_id = $request->product_id;
-		// $save = $invoiceLine->save();
-
 	}
 
 	public function getEventsList() {
