@@ -1,7 +1,5 @@
 $(document).ready(function(){
 
-	console.log('events');
-
 	toastr.options.preventDuplicates = false;
 
 	loadEvents();

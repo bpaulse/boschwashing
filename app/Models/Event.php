@@ -9,8 +9,8 @@ class Event extends Model
 {
 	use HasFactory;
 
-	public function athlete() {
-		return $this->hasMany(Athlete::class);
+	public function athleteevent() {
+		return $this->hasMany(AthleteEvent::class);
 	}
 
 	public function wod() {

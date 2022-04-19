@@ -12,6 +12,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\pdfController;
 use App\Http\Controllers\SendMailController;
 
+Route::get('/login', [CustomAuthController::class, 'login']);
+Route::get('/registration', [CustomAuthController::class, 'registration']);
+
 Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
 Route::post('/add-invoice', [InvoiceController::class, 'addInvoice'])->name('add.invoice');
@@ -38,6 +41,8 @@ Route::get('/displayEventDetails/{id}', [EventController::class, 'displayEventDe
 Route::get('/getWodsForEvent', [EventDetailController::class, 'getWodsForEvent']);
 Route::get('/getAthleteForEvent', [EventDetailController::class, 'getAthleteForEvent']);
 
+Route::get('/getGender', [EventController::class, 'getGender']);
+
 Route::get('/getEventName', [EventController::class, 'getEventName']);
 
 Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
@@ -47,9 +52,15 @@ Route::post('/add-client', [ClientController::class, 'addClient'])->name('add.cl
 
 Route::get('/getWODDesc', [EventDetailController::class, 'getWODDesc']);
 Route::get('/wodDetails/{id}/{wodid}', [EventDetailController::class, 'wodDetails']);
-Route::get('/wodResults/{id}', [EventDetailController::class, 'wodResults']);
+Route::get('/wodResults/{id}/{wodid}', [EventDetailController::class, 'wodResults']);
 Route::get('/getAthletesForEvent', [EventDetailController::class, 'getAthletesForEvent']);
 Route::get('/searchAthlete', [EventDetailController::class, 'searchAthlete']);
+
+Route::get('/populateScoringInputForm', [EventDetailController::class, 'populateScoringInputForm']);
+Route::get('/saveInputScoring', [EventDetailController::class, 'saveInputScoring']);
+
+Route::get('/getAllDivisions', [EventDetailController::class, 'getAllDivisions']);
+Route::get('/getLeaderBoardData', [EventDetailController::class, 'getLeaderBoardData']);
 
 // User Management
 // Route::get('dashboard', [CustomAuthController::class, 'dashboard']); 

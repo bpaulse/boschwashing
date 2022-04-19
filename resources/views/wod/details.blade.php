@@ -36,7 +36,9 @@
 								<th style="width: 30%">Name</th>
 								<th style="width: 30%">Category</th>
 								<th style="width: 25%">Gender</th>
-								<th style="width: 15%">Action</th>
+								<th style="width: 5%">Score</th>
+								<th style="width: 5%">Score Status</th>
+								<th style="width: 10%">Action</th>
 							</thead>
 							<tbody id='athleteData'></tbody>
 						</table>

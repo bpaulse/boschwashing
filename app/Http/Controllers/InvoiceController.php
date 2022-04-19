@@ -34,11 +34,14 @@ class InvoiceController extends Controller
 			$data = [
 				'invoice_id' => $invoice_id,
 				'name' => $client->name . ' ' . $client->surname,
-				'email' => $client->email
+				'email' => $client->email,
+				'subject' => 'Client Invoice: From My Business'
 			];
 
 			$sendMail = new SendMailController();
 			$sendMail->send_mail($data);
+
+			return response()->json(['code' => 1, 'msg' => 'Email has successfully been sent to your client mailbox!' ]);
 
 			// if ( $return['code'] === 1 ) {
 			// 	return response()->json(['code' => $return['code'], 'msg' => $return['msg'], 'data' => $invoice_id ]);

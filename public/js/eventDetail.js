@@ -9,15 +9,19 @@ $(document).ready(function(){
 	loadWods(eventid);
 
 	$(document).on('click', '.scoreboard', function(evt){
-		window.location.href = '/wodResults/' + eventid;
+		let wodid = $(this).closest('tr').attr('data-wod_id');
+		window.location.href = '/wodResults/' + eventid + '/' + wodid;
 	});
 
 	$(document).on('click', '.backEvent', backToEvents);
 
 	$(document).on('click', '.addAthlete', function () {
-		console.log('addAthlete');
+
 		$('#event_id').val(eventid);
 		$('#addAthleteModal').modal('show');
+
+		getGender();
+
 	});
 
 	$(document).on('click', '.addWod', function () {
@@ -189,9 +193,32 @@ function backToEvents () {
 }
 
 function addAthlete () {
-	console.log('addAthlete');
 	$('#event_id').val(eventid);
 	$('#addAthleteModal').modal('show');
+}
+
+function getGender() {
+
+	$.ajax({
+		type: 'GET',
+		url: '/getGender',
+		data: {},
+		dataType: 'json',
+		contentType: false,
+		success: function (response) {
+
+			var items = "";
+			$.each(response, function(index,data2){
+				items += "<option id='"+data2.id+"'>" + data2.settingdesc + "</option>";
+			});
+			$("#gender").append(items);
+
+		},
+		error: function(e) {
+			console.log(e);
+		}
+	});
+
 }
 
 function loadWods(eventid) {

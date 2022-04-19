@@ -463,9 +463,7 @@ function sendInvoice(e) {
 
 	e.preventDefault();
 	var id = $(this).closest('tr').attr('data-id');
-
 	console.log('id: ' + id);
-
 	buildAndSendInvoice(id);
 }
 
@@ -484,13 +482,11 @@ function buildAndSendInvoice(id) {
 		dataType: 'json',
 		beforeSend: function() {
 			$('#loading-div').show();
-			// $("#loading-div").show().delay(5000).fadeOut();
 		},
 		success: function(response) {
 
-			console.log('success');
-
-			// $('#loading-div').hide();
+			toastr.success(response.msg);
+			$('#loading-div').hide();
 			// if (response.code === 1) {
 			// 	toastr.success(response.msg);
 			// 	// console.log($('tr[data-id="' + response.data + '"] th:nth-child(2)').html());

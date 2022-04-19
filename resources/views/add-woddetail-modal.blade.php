@@ -7,7 +7,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<form action="{{ route('add.score') }}" method="POST" id="add-wod-score">
+			<form id="add-wod-score">
 				@csrf
 				<div class="modal-body">
 					<table class="table">
@@ -19,6 +19,7 @@
 								</div>
 							</td>
 							<input type="hidden" id="wod_id" value="">
+							<input type="hidden" id="athlete_id" value="">
 						</tr>
 						<tr>
 							<td style="width: 100%; padding-top: 19px;">
@@ -30,7 +31,7 @@
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary">Add</button>
+					<button class="btn btn-primary" id="addscoreform">Add</button>
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 				</div>
 			</form>

@@ -15,8 +15,6 @@
 </head>
 <body>
 
-	{{-- <a href="{{route('print.pdf')}}">Print PDF</a> --}}
-
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
 			<div class="col-md-8">

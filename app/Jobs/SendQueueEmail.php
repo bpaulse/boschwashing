@@ -53,7 +53,10 @@ class SendQueueEmail implements ShouldQueue
 		];
 
 		\Mail::send('emails.Test_mail', ['name' => 'Bevan'], function($message) use($input, $attachment_mime){
-			$message->to($input['email'], $input['name'])->subject($input['subject'])->attach(public_path('pdf' . $this->ds . $attachment_mime['as']), $attachment_mime);
+			$message
+			->to($input['email'], $input['name'])
+			->subject($input['subject'])
+			->attach(public_path('pdf' . $this->ds . $attachment_mime['as']), $attachment_mime);
 		});
 
 	}
