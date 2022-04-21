@@ -16,19 +16,15 @@
 </head>
 <body>
 
-	<div class="container" style="border: 1px solid black;">
+	<div class="container">
 		<div class="w-100 text-right p-3"><button class="btn btn-info text-right backWodList">Back</button></div>
 		<h2>Dynamic Tabs</h2>
 		<p>To make the tabs toggleable, add the data-toggle="tab" attribute to each link. Then add a .tab-pane class with a unique ID for every tab and wrap them inside a div element with class .tab-content.</p>
 		
-		<ul class="nav nav-tabs">
-		</ul>
-
-		<div class="tab-content" style="border: 1px solid black;"></div>
+		<ul class="nav nav-tabs"></ul>
+		<div class="tab-content">Leader Board Data</div>
 
 	</div>
-
-	{{-- @include('add-woddetail-modal'); --}}
 
 	<script src="{{ asset('jquery/jquery-3.6.0.min.js') }}"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>

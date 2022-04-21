@@ -35,17 +35,77 @@ function getDivision(eventid, wodid) {
 		contentType: false,
 		success: function (response) {
 
-			let divDetails = response.static;
+			let eventData = response.eventData;
+			let athletes;
 
-			$.each(response.data, function(data1,division){
+			console.log( 'response' );
+			console.log( response.leaderboard );
 
-				if ( data1 == 0 ) {
-					buildTabs('First', division, divDetails);
-				} else {
-					buildTabs('Other', division, divDetails);
+			$.each(eventData.data, function(data1,gender){
+				for (let i = 0; i < gender.length; i++) {
+
+					if ( data1 == 0 ){
+						$(".nav-tabs").append(tabHTML('active', gender[i]));
+						$(".tab-content").append(contentHTML('in active', gender[i]));
+					} else {
+						$(".nav-tabs").append(tabHTML('', gender[i]));
+						$(".tab-content").append(contentHTML('', gender[i]));
+					}
 				}
+			});
+
+
+			$.each(response.leaderboard, function(data1,mann){
+
+				// console.log('mann');
+				// console.log(mann);
+
+				var category = Object.keys(mann)[0];
+				console.log(category);
+
+
+				// athletes = mann[category];
+				let rows = '';
+
+				console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+
+				$.each(mann, function(data1,leaderboard){
+
+					console.log(Object.keys(leaderboard)[0]);
+
+					console.log('leaderboard');
+					console.log(leaderboard[0]);
+
+					currLeaderboard = leaderboard[0];
+
+					let rows = '';
+
+					let num = 0;
+					for (let i = 0; i < currLeaderboard.length; i++) {
+						// console.log('currLeaderboard');
+						// console.log(currLeaderboard[i]);
+						num = Number(i) + 1;
+						rows += '<tr><td>'+num+'</td><td>'+currLeaderboard[i].fullname+'</td><td>'+currLeaderboard[i].score+'</td></tr>';
+					}
+
+					console.log(rows);
+
+				});
+
+				console.log('************************************************************************');
 
 			});
+
+			// let divDetails = response.static;
+			// $.each(response.data, function(data1,division){
+
+			// 	if ( data1 == 0 ) {
+			// 		buildTabs('First', division, divDetails);
+			// 	} else {
+			// 		buildTabs('Other', division, divDetails);
+			// 	}
+
+			// });
 
 		},
 		error: function(e) {
