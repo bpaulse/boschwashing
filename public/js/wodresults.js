@@ -8,9 +8,6 @@ $(document).ready(function(){
 	var eventid = chunks[chunks.length-2];
 	var wodid = chunks[chunks.length-1];
 
-	// console.log('wodid');
-	// console.log(wodid);
-
 	// add li tabs
 	populateUL(eventid, wodid);
 
@@ -35,11 +32,12 @@ function getDivision(eventid, wodid) {
 		contentType: false,
 		success: function (response) {
 
-			let eventData = response.eventData;
-			let athletes;
+			// console.log(response);
 
-			console.log( 'response' );
-			console.log( response.leaderboard );
+			let eventData = response.eventData;
+
+			console.log('eventData');
+			console.log(eventData.data[5][0]);
 
 			$.each(eventData.data, function(data1,gender){
 				for (let i = 0; i < gender.length; i++) {
@@ -57,55 +55,61 @@ function getDivision(eventid, wodid) {
 
 			$.each(response.leaderboard, function(data1,mann){
 
-				// console.log('mann');
-				// console.log(mann);
+				console.log(mann);
 
-				var category = Object.keys(mann)[0];
-				console.log(category);
+				// var elementId;
+
+				var divId = '';
+
+				$.each(mann, function(index,wodloaderboard){
+
+					// divId = eventData.data[]
 
 
-				// athletes = mann[category];
-				let rows = '';
+					console.log(index);
+					var board = wodloaderboard[4][0];
+					console.log('board');
+					console.log(board);
 
-				console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+					console.log('athletetype');
+					console.log(board[0].athletetype);
 
-				$.each(mann, function(data1,leaderboard){
-
-					console.log(Object.keys(leaderboard)[0]);
-
-					console.log('leaderboard');
-					console.log(leaderboard[0]);
-
-					currLeaderboard = leaderboard[0];
-
-					let rows = '';
-
-					let num = 0;
-					for (let i = 0; i < currLeaderboard.length; i++) {
-						// console.log('currLeaderboard');
-						// console.log(currLeaderboard[i]);
-						num = Number(i) + 1;
-						rows += '<tr><td>'+num+'</td><td>'+currLeaderboard[i].fullname+'</td><td>'+currLeaderboard[i].score+'</td></tr>';
+					var num = 1;
+					var rows;
+					for ( var j = 0; j < board.length; j++ ){
+						rows += '<tr><td>'+num+'</td><td>'+board[j].fullname+'</td><td>'+board[j].score+'</td></tr>';
+						num = Number(num) + 1;
 					}
 
-					console.log(rows);
+					console.log(eventData.data[board[0].athletetype][0].id);
 
 				});
 
-				console.log('************************************************************************');
+				// var elementId = eventData.data[category][0].id;
+				// console.log('elementId');
+				// console.log(elementId);
+
+				// var category = Object.keys(mann)[0];
+				// $.each(mann, function(data1,leaderboard){
+
+				// 	currLeaderboard = leaderboard[0];
+
+				// 	let rows = '';
+				// 	let num = 0;
+
+				// 	for (let i = 0; i < currLeaderboard.length; i++) {
+
+				// 		num = Number(i) + 1;
+				// 		rows += '<tr><td>'+num+'</td><td>'+currLeaderboard[i].fullname+'</td><td>'+currLeaderboard[i].score+'</td></tr>';
+				// 	}
+
+				// 	let divId = eventData.data[category][0].id;
+
+				// 	$("#"+divId).append(createTable(rows));
+				// });
 
 			});
 
-			// let divDetails = response.static;
-			// $.each(response.data, function(data1,division){
-
-			// 	if ( data1 == 0 ) {
-			// 		buildTabs('First', division, divDetails);
-			// 	} else {
-			// 		buildTabs('Other', division, divDetails);
-			// 	}
-
-			// });
 
 		},
 		error: function(e) {
@@ -156,50 +160,7 @@ function contentHTML(classStr, data){
 }
 
 function createTable (tablecontent) {
-	return '<div style="float: left; padding: 10px;"><table style="border: 1px solid black; width: 120px; font-size: 8pt;">'+tablecontent+'</table></div>';
-}
-
-function tableContent(details, id) {
-
-	$.ajax({
-		type: 'GET',
-		url: '/getLeaderBoardData',
-		data: {details: details},
-		dataType: 'json',
-		contentType: false,
-		success: function (response) {
-
-			console.log('TABLECONTENT');
-			// console.log(response);
-
-			let divisionData = ''; 
-			let table = '';
-			$.each(response, function(data1,leaderboard){
-
-				let rows = TableHeader();
-
-				$.each(leaderboard, function(data1,event){
-
-					let num = 0;
-					for (var i in event) {
-						num = Number(i) + Number(1);
-						rows += '<tr><td>'+num+'</td><td>'+event[i].fullname+'</td><td>'+event[i].score+'</td></tr>';
-					}
-
-				});
-
-				divisionData += createTable(rows); 
-
-			});
-
-			console.log(divisionData);
-			$("#"+id).append(divisionData);
-
-		},
-		error: function(e) {
-			console.log(e);
-		}
-	});
+	return '<div style="float: left; padding: 10px;"><table style="border: 1px solid black; width: 120px; font-size: 8pt;">'+TableHeader()+tablecontent+'</table></div>';
 }
 
 function TableHeader () {

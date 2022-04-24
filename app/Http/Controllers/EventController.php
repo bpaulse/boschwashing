@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\Wod;
+use App\Models\AthleteEvent;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+
+use App\Http\Controllers\EventDetailController;
 
 class EventController extends Controller
 {
 	public function eventslist()
 	{
+		// $data = app('App\Http\Controllers\EventDetailController')->getAllDivisionsTest(1, 40);
 		return view('events');
 	}
 

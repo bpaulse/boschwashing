@@ -52,8 +52,7 @@ class EventDetailController extends Controller {
 
 		return response()->json($athletes);
 	}
-	
-	
+
 	public function searchAthlete (Request $request) {
 
 		$eventid = $request->input('eventid');
@@ -271,15 +270,79 @@ class EventDetailController extends Controller {
 
 	}
 
-	public function gender($event_id) {
-		$gender = [];
-		$athleteEvent = AthleteEvent::select('gender')->distinct('gender')->where('event_id', $event_id)->get();
-		foreach ( $athleteEvent as $item ) {
-			$gender[] = $item->gender;
-		}
-		return $gender;
+	public function wodResults ($id) {
+
+		// $tabs = DB::select('SELECT 
+		// 		settings.id, 
+		// 		settings.settingdesc 
+		// 	FROM 
+		// 		athletes 
+		// 	INNER JOIN 
+		// 		settings 
+		// 	ON 
+		// 		athletes.athletetype = settings.id 
+		// 	WHERE athletes.event_id = ? 
+		// 	GROUP BY settings.settingdesc, settings.id', 
+		// 	[$id]
+		// );
+
+		$tabs = DB::select('SELECT 
+				* 
+			FROM 
+				athlete_events
+			WHERE event_id = 1', 
+			[]
+		);
+
+		$data = ['tabs' => $tabs];
+
+		return view('wod.results')->with(['data' => $data]);
+
 	}
 
+	public function getAllDivisionsTest() {
+
+		$eventid = 1;
+		$wodid = 40;
+
+		return response()->json($this->allDivisions($eventid, $wodid));
+
+	}
+
+	public function getAllDivisions(Request $request) {
+
+		$eventid = $request->input('eventid');
+		$wodid = $request->input('wodid');
+
+		return response()->json(allDivisions($eventid, $wodid));
+
+	}
+
+	private function allDivisions($eventid, $wodid){
+
+		$divs = $this->divisionIDs($eventid);
+
+		$leaderboard = [];
+		foreach ( $divs as $gender=>$div ) {
+			foreach ( $div as $cat ) {
+				$data = [
+					'eventid' => $eventid,
+					'wodid' => $wodid,
+					'gender' => $gender,
+					'cat' => $cat
+				];
+			}
+			$leaderboard[] = $this->getLeaderBoardData($data);
+		}
+
+		// var_dump($leaderboard);
+		// exit();
+
+		$eventData = $this->tabsForDisplay($eventid, $wodid);
+
+		return ['leaderboard' => $leaderboard, 'eventData' => $eventData];
+
+	}
 
 	public function divisionIDs ($eventid) {
 
@@ -296,35 +359,15 @@ class EventDetailController extends Controller {
 
 		return $output;
 
-		// $output = DB::select('SELECT DISTINCT athletetype FROM athlete_events  WHERE gender = ?', [$eventid]); 
-		// $items = DB::select('SELECT DISTINCT athletetype FROM athlete_events  WHERE gender IN (SELECT DISTINCT gender FROM athlete_events WHERE event_id = ?)', [$eventid]);
-
 	}
 
-	public function getAllDivisions(Request $request) {
-
-		$eventid = $request->input('eventid');
-		$wodid = $request->input('wodid');
-		$divs = $this->divisionIDs($eventid);
-
-		$leaderboard = [];
-		
-		foreach ( $divs as $gender=>$div ) {
-			foreach ( $div as $cat ) {
-				$data = [
-					'eventid' => $eventid,
-					'wodid' => $wodid,
-					'gender' => $gender,
-					'cat' => $cat
-				];
-				$leaderboard[] = $this->getLeaderBoardData($data);
-			}
+	public function gender($event_id) {
+		$gender = [];
+		$athleteEvent = AthleteEvent::select('gender')->distinct('gender')->where('event_id', $event_id)->get();
+		foreach ( $athleteEvent as $item ) {
+			$gender[] = $item->gender;
 		}
-
-		$eventData = $this->tabsForDisplay($eventid, $wodid);
-
-		return response()->json(['leaderboard' => $leaderboard, 'eventData' => $eventData]);
-
+		return $gender;
 	}
 
 	private function getLeaderBoardData ($details) {
@@ -335,12 +378,13 @@ class EventDetailController extends Controller {
 
 		foreach ( $ids as $wodInfo ) {
 
+			var_dump($wodInfo->id);
+
 			$wod = Wod::select('*')->where('id', $wodInfo->id)->firstOrFail();
 
 			if ( $wod->wodtype == 2 ) {
 
-				// $wodleaderboard[$wodInfo->id][] = $this->leaderboardForTime(
-				$wodleaderboard[$details['cat']][] = $this->leaderboardForTime(
+				$wodleaderboard[$wod->id][$details['cat']][] = $this->leaderboardForTime(
 					[
 						'eventid'		=> $details['eventid'], 
 						'wodid'			=> $wodInfo->id, 
@@ -351,15 +395,29 @@ class EventDetailController extends Controller {
 
 			} else {
 
-				// $wodleaderboard[$wodInfo->id][] = $this->leaderboardOther(['eventid' => $details['eventid'], 'wodid' => $wodInfo->id]);
+				$wodleaderboard[$wod->id][$details['cat']][] = $this->leaderboardOther(
+					[
+						'eventid' => $details['eventid'],
+						'wodid' => $wodInfo->id, 
+						'gender'		=> $details['gender'],
+						'athletetype'	=> $details['cat']
+					]
+				);
 
 			}
 
 		}
 
+		exit();
+
 		return $wodleaderboard;
 	}
 
+	public function getWodsIDs ($event_id) {
+		//
+		$wodids = Wod::select('id')->where('event_id', $event_id)->get();
+		return $wodids;
+	}
 
 	public function tabsForDisplay($eventid, $wodid) {
 
@@ -374,7 +432,7 @@ class EventDetailController extends Controller {
 			WHERE 
 				ae.event_id = ?;',
 			[$eventid]
-		);
+		);	
 
 		$categories = DB::select('SELECT 
 				DISTINCT gender, st.settingdesc
@@ -407,39 +465,6 @@ class EventDetailController extends Controller {
 
 	}
 
-	public function getWodsIDs ($event_id) {
-		//
-		$wodids = Wod::select('id')->where('event_id', $event_id)->get();
-		return $wodids;
-	}
-
-	public function getLeaderBoardData1 (Request $request) {
-
-		$details = $request->input('details');
-		$ids = $this->getWodsIDs($details['eventid']);
-
-		foreach ( $ids as $wodInfo ) {
-
-			$wod = Wod::select('*')->where('id', $wodInfo->id)->firstOrFail();
-
-			if ( $wod->wodtype == 2 ) {
-
-				$wodleaderboard[$wodInfo->id][] = $this->leaderboardForTime(['eventid' => $details['eventid'], 'wodid' => $wodInfo->id]);
-
-			} else {
-
-				// $wodleaderboard[$wodInfo->id][] = $this->leaderboardOther(['eventid' => $details['eventid'], 'wodid' => $wodInfo->id]);
-
-			}
-
-		}
-
-		// var_dump($wodleaderboard);
-
-		return $wodleaderboard;
-
-	}
-
 	private function leaderboardOther($data) {
 
 		$leaderboard = [];
@@ -448,15 +473,16 @@ class EventDetailController extends Controller {
 			sc.athlete_id,
 			sc.wod_id,
 			athev.event_id,
-			sc.score
+			sc.score,
+			athev.gender, 
+			athev.athletetype
 		FROM scores as sc
 		inner join athletes as ath on ath.id = sc.athlete_id
 		INNER JOIN athlete_events AS athev ON athev.athlete_id = sc.athlete_id
-		WHERE athev.event_id = ? AND sc.wod_id = ?
+		WHERE athev.event_id = ? AND sc.wod_id = ? AND athev.athletetype = ? AND athev.gender = ? 
 		ORDER BY sc.score DESC';
 
-		$prepvars = [(int)$data['eventid'], (int)$data['wodid']];
-
+		$prepvars = [(int)$data['eventid'], (int)$data['wodid'], (int)$data['athletetype'], (int)$data['gender']];
 		$leaderboard = DB::select($sql, $prepvars);
 
 		return $leaderboard;
@@ -472,7 +498,9 @@ class EventDetailController extends Controller {
 			sc.athlete_id,
 			sc.wod_id,
 			athev.event_id,
-			sc.score
+			sc.score,
+			athev.gender, 
+			athev.athletetype
 		FROM scores as sc
 		inner join athletes as ath on ath.id = sc.athlete_id
 		INNER JOIN athlete_events AS athev ON athev.athlete_id = sc.athlete_id
@@ -483,46 +511,9 @@ class EventDetailController extends Controller {
 
 		$leaderboard = DB::select($sql, $prepvars);
 
-		// var_dump('leaderboard');
-		// var_dump((int)$data['athletetype'], (int)$data['gender']);
-		// var_dump($leaderboard);
-		// var_dump('______________________________________________________________________________________________');
-
-
 		return $leaderboard;
 
 	}
 
-	public function wodResults ($id) {
-
-		// $tabs = DB::select('SELECT 
-		// 		settings.id, 
-		// 		settings.settingdesc 
-		// 	FROM 
-		// 		athletes 
-		// 	INNER JOIN 
-		// 		settings 
-		// 	ON 
-		// 		athletes.athletetype = settings.id 
-		// 	WHERE athletes.event_id = ? 
-		// 	GROUP BY settings.settingdesc, settings.id', 
-		// 	[$id]
-		// );
-
-		$tabs = DB::select('SELECT 
-			* 
-		FROM 
-			athlete_events
-		WHERE event_id = 1', 
-		[]
-	);
-
-
-
-		$data = ['tabs' => $tabs];
-
-		return view('wod.results')->with(['data' => $data]);
-
-	}
 
 }
