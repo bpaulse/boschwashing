@@ -13,19 +13,19 @@ use App\Http\Controllers\EventDetailController;
 
 class EventController extends Controller
 {
-	public function eventslist()
-	{
-		// $data = app('App\Http\Controllers\EventDetailController')->getAllDivisionsTest(1, 40);
+
+	private $active = 1;
+
+	public function eventslist() {
 		return view('events');
 	}
 
-	public function addEvent(Request $request)
-	{
+	public function addEvent(Request $request) {
 
-		$event_name				= $request->event_name;
-		$event_desc				= $request->event_desc;
-		$event_location			= $request->event_location;
-		$event_date				= $request->event_date;
+		$event_name				= $request->input('event_name');
+		$event_desc				= $request->input('event_desc');
+		$event_location			= $request->input('event_location');
+		$event_date				= $request->input('event_date');
 
 		$validator = Validator::make($request->all(), [
 			'event_name'		=> 'required|max:255',
@@ -42,7 +42,7 @@ class EventController extends Controller
 			$event->event_desc		= $event_desc;
 			$event->event_location	= $event_location;
 			$event->event_date		= $event_date;
-			$event->published		= 0;
+			$event->published		= $this->active;
 			$event->user_id			= 1;
 
 			$save = $event->save();
@@ -76,16 +76,20 @@ class EventController extends Controller
 			}
 
 		} else {
-
 			var_dump('failed');
 			var_dump($validator->errors()->toArray());
 		}
 
 	}
 
-	public function getEventsList() {
-		$events = Event::all();
+	public function getEventsList(){
+
+		$events = Event::where('published', '=', $this->active)->get();
 		return response()->json(['details' => $events]);
+	}
+
+	public function getGender() {
+		return response()->json(DB::select('SELECT * FROM settings WHERE settingname = ?', ['athlete_gender']));
 	}
 
 	public function getEventName(Request $request) {
@@ -96,6 +100,46 @@ class EventController extends Controller
 
 	public function displayEventDetails($eventid) {
 		return view('events.detail')->with(['eventid' => $eventid]);
+	}
+
+	public function changeEventStatus(Request $request) {
+
+		$event_id = $request->input('event_id');
+		$eventData = [ 'published' => 0 ];
+
+		$update = Event::where('id', '=', $event_id)->update($eventData);
+		$data = ['event_id' => $event_id, 'update' => $update];
+
+		return response()->json($data);
+
+	}
+
+	public function getEventDetails(Request $request) {
+		$eventid = $request->eventid;
+		$event = Event::select('*')->where('id', $eventid)->firstOrFail();
+		return response()->json($event);
+	}
+
+	public function updateEventData(Request $request) {
+
+		$event_id		 = $request->event_id;
+		$event_name		 = $request->event_name;
+		$event_desc		 = $request->event_desc;
+		$event_loc		 = $request->event_loc;
+		$event_mod_date	 = $request->event_mod_date;
+
+		$eventData = [
+			'event_name' => $event_name,
+			'event_desc' => $event_desc,
+			'event_location' => $event_loc,
+			'event_date' => $event_mod_date
+		];
+
+		$update = Event::where('id', '=', $event_id)->update($eventData);
+		$data = ['event_id' => $event_id, 'eventData' => $eventData, 'update' => $update];
+
+		return response()->json($data);
+
 	}
 
 }

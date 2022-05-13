@@ -6,6 +6,8 @@ use App\Models\Athlete;
 use App\Models\Wod;
 use App\Models\AthleteEvent;
 use App\Models\Score;
+use App\Models\Setting;
+use App\Models\Leaderboard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -87,7 +89,6 @@ class EventDetailController extends Controller {
 	}
 
 	public function insertScores ($data) {
-		// return "INSERT INTO `scores` (`id`, `score`, `athlete_id`, `wod_id`, `created_at`, `updated_at`) VALUES (NULL, NULL, '14', '40', NULL, NULL), (NULL, NULL, '21', '40', NULL, NULL);";
 		$score = new Score();
 		$score->athlete_id = $data['athlete_id'];
 		$score->wod_id = $data['wod_id'];
@@ -96,7 +97,6 @@ class EventDetailController extends Controller {
 	}
 
 	public function insertAthleteEvents ($data) {
-		// return "INSERT INTO `athlete_events` (`athlete_id`, `event_id`) VALUES ('23', '1')";
 		$athleteEvent = new AthleteEvent();
 		$athleteEvent->athlete_id = $data['athlete_id'];
 		$athleteEvent->event_id = $data['event_id'];
@@ -161,7 +161,6 @@ class EventDetailController extends Controller {
 		$athletetype			= $request->input('athlete_type');
 		$gender					= $request->input('gender');
 		$eventid				= $request->input('event_id');
-		// $wodid					= $request->input('wod_id');
 
 		$athlete = new Athlete();
 
@@ -169,32 +168,66 @@ class EventDetailController extends Controller {
 		$athlete->Surname 		= $athlete_surname;
 		$athlete->cellphone 	= $cellphone;
 		$athlete->email 		= $email;
-		$athlete->athletetype 	= $athletetype;
-		$athlete->gender	 	= $gender;
-		$athlete->event_id 		= $eventid;
-		// $athlete->wod_id 		= $wodid;
 
-		$save = $athlete->save();
+		if ( $athlete->save() ) {
 
-		if ( $save ) {
+			$athleteEvent = new AthleteEvent();
 
-			$athleteData = [
-				'athlete' => $athlete
-			];
+			$athleteEvent->athlete_id	= $athlete->id;
+			$athleteEvent->event_id		= $eventid;
+			$athleteEvent->gender		= $this->getGenderId($gender);
+			$athleteEvent->athletetype	= $athletetype;
 
-			return response()->json([
-				'code' => 1,
-				'msg' => 'New Athlete/Team has been successfully created!',
-				'data' => $athleteData
-			]);
+			if ( $athleteEvent->save() ) {
 
-		} else {
-			return response()->json([
-				'code' => 0,
-				'msg' => 'Something went wrong.',
-				'data' => null
-			]);
+				// get all the WODS for the event
+				$wodIDS = $this->getWodsIDs($eventid);
+				$saveScores = $this->multipleScoreEntries($wodIDS, $athlete->id);
 
+				if ( $saveScores ) {
+
+					$athleteData = [
+						'athlete' => $athlete
+					];
+
+					return response()->json([
+						'code' => 1,
+						'msg' => 'New Athlete/Team has been successfully created!',
+						'data' => $athleteData
+					]);
+				}
+			}
+
+		}
+
+		return response()->json([
+			'code' => 0,
+			'msg' => 'Something went wrong.',
+			'data' => null
+		]);
+
+	}
+
+	public function multipleScoreEntries ($wodIDS, $athlete_id) {
+
+		$length = sizeof($wodIDS);
+		$counter = 0;
+
+		foreach ( $wodIDS as $wod ) {
+			// var_dump('wod_id');
+			// var_dump($wod->id);
+			$score = new Score();
+			$score->score		= NULL;
+			$score->wod_id		= $wod->id;
+			$score->athlete_id	= $athlete_id;
+			$score->save();
+			$counter++;
+		}
+
+		if ( $length == $counter ) {
+			return true;
+		} else { 
+			return false;
 		}
 
 	}
@@ -203,11 +236,33 @@ class EventDetailController extends Controller {
 		return view('wod.details');
 	}
 
+	public function getGenderId($str) {
+		$idObj = DB::select('SELECT id FROM settings WHERE settingdesc = ?', [$str]);
+		return $idObj[0]->id;
+	}
+
 	public function saveInputScoring (Request $request) {
 
 		$whereClause = ['wod_id' => $request->input('wod_id'), 'athlete_id' => $request->input('athlete_id')];
 		$update = Score::where($whereClause)->update(['score' => $request->input('score')]);
 		$data = ['wod_id' => $request->input('wod_id'), 'athlete_id' => $request->input('athlete_id'), 'score' => $request->input('score')];
+		return response()->json(['data' => $data, 'update' => $update]);
+
+	}
+
+	public function saveValueScoring(Request $request) {
+
+		$score = $request->input('wodvalue');
+		$type = $request->input('submittype');
+		$athleteid = $request->input('athleteid');
+		$wodid = $request->input('wodid');
+
+		// update score
+		$whereClause = ['wod_id' => $wodid, 'athlete_id' => $athleteid];
+		$update = Score::where($whereClause)->update(['score' => $score]);
+
+		$data = ['wod_id' => $wodid, 'athlete_id' => $athleteid, 'score' => $score];
+
 		return response()->json(['data' => $data, 'update' => $update]);
 
 	}
@@ -262,6 +317,43 @@ class EventDetailController extends Controller {
 		return response()->json($athInfo);
 	}
 
+	public function getWODDescAndSettings (Request $request) {
+
+		$id = $request->input('wodid');
+		$wod = Wod::select('*')->where('id', $id)->firstOrFail();
+		$settings = $this->getSettingGroup('wod_type');
+		return response()->json(['wod' => $wod, 'settings' => $settings]);
+
+	}
+
+	public function updateWod(Request $request) {
+
+		$wod_id = $request->input('wod_id');
+		$wod_name = $request->input('wod_name');
+		$wod_desc = $request->input('wod_desc');
+		$wod_type = $request->input('wod_type');
+		$wod_type_name = $request->input('wod_type_name');
+
+		$wodData = [
+			'wodname' => $request->input('wod_name'),
+			'woddesc' => $request->input('wod_desc'),
+			'wodtype' => $request->input('wod_type')
+		];
+
+		$update = Wod::where('id', '=', $wod_id)->update($wodData);
+
+		$wodData['wodtypename'] = $wod_type_name;
+
+		$data = ['wod_id' => $wod_id, 'wodData' => $wodData, 'update' => $update];
+
+		return response()->json($data);
+
+	}
+
+	public function getSettingGroup($settingDesc) {
+		return Setting::select('*')->where('settingname', $settingDesc)->get();
+	}
+
 	public function getWODDesc (Request $request) {
 
 		$id = $request->input('wodid');
@@ -314,46 +406,50 @@ class EventDetailController extends Controller {
 		$eventid = $request->input('eventid');
 		$wodid = $request->input('wodid');
 
-		return response()->json(allDivisions($eventid, $wodid));
+		return response()->json($this->allDivisions($eventid, $wodid));
 
 	}
 
 	private function allDivisions($eventid, $wodid){
 
-		$divs = $this->divisionIDs($eventid);
-
-		$leaderboard = [];
-		foreach ( $divs as $gender=>$div ) {
-			foreach ( $div as $cat ) {
-				$data = [
-					'eventid' => $eventid,
-					'wodid' => $wodid,
-					'gender' => $gender,
-					'cat' => $cat
-				];
-			}
-			$leaderboard[] = $this->getLeaderBoardData($data);
-		}
-
-		// var_dump($leaderboard);
-		// exit();
-
+		$divs = $this->divisionIDs($eventid, $wodid);
 		$eventData = $this->tabsForDisplay($eventid, $wodid);
-
-		return ['leaderboard' => $leaderboard, 'eventData' => $eventData];
+		return ['leaderboard' => $divs, 'eventData' => $eventData];
 
 	}
 
-	public function divisionIDs ($eventid) {
+	public function divisionIDs ($eventid, $wodid) {
 
 		$output = [];
 
-		$genders = $this->gender($eventid);
+		$this->clearEventLeaderBoard($eventid);
 
-		foreach ( $genders as $gender ){
-			$athletetype = DB::select('SELECT DISTINCT athletetype FROM athlete_events  WHERE gender = ?', [$gender]);
-			foreach($athletetype as $type){
-				$output[$gender][] = $type->athletetype;
+		$wodids = $this->getWodsIDs ($eventid);
+		foreach ( $wodids as $wod ) {
+			$genders = $this->gender($eventid);
+			foreach ( $genders as $gender ){
+				$athletetypeIds = $this->getAthleteTypeIDs ($gender, $eventid);
+				foreach($athletetypeIds as $athletetypeId){
+					if ( $wod->wodtype == 2 ) {
+						$output[$eventid][$wod->id][$gender][$athletetypeId->athletetype] = $this->leaderboardForTime(
+							[
+								'eventid'		=> $eventid, 
+								'wodid'			=> $wod->id, 
+								'gender'		=> $gender,
+								'athletetype'	=> $athletetypeId->athletetype
+							]
+						);
+					} else {
+						$output[$eventid][$wod->id][$gender][$athletetypeId->athletetype] = $this->leaderboardOther(
+							[
+								'eventid'		=> $eventid,
+								'wodid'			=> $wod->id, 
+								'gender'		=> $gender,
+								'athletetype'	=> $athletetypeId->athletetype
+							]
+						);
+					}
+				}
 			}
 		}
 
@@ -378,7 +474,7 @@ class EventDetailController extends Controller {
 
 		foreach ( $ids as $wodInfo ) {
 
-			var_dump($wodInfo->id);
+			// var_dump($wodInfo);exit();
 
 			$wod = Wod::select('*')->where('id', $wodInfo->id)->firstOrFail();
 
@@ -392,7 +488,6 @@ class EventDetailController extends Controller {
 						'athletetype'	=> $details['cat']
 					]
 				);
-
 			} else {
 
 				$wodleaderboard[$wod->id][$details['cat']][] = $this->leaderboardOther(
@@ -403,20 +498,21 @@ class EventDetailController extends Controller {
 						'athletetype'	=> $details['cat']
 					]
 				);
-
 			}
 
 		}
-
-		exit();
 
 		return $wodleaderboard;
 	}
 
 	public function getWodsIDs ($event_id) {
-		//
-		$wodids = Wod::select('id')->where('event_id', $event_id)->get();
+		$wodids = Wod::select('id', 'wodtype')->where('event_id', $event_id)->get();
 		return $wodids;
+	}
+
+	public function getAthleteTypeIDs ($gender, $eventid) {
+		$athletetypeIds = DB::select('SELECT DISTINCT athletetype FROM athlete_events  WHERE gender = ? and event_id = ?', [$gender, $eventid]);
+		return $athletetypeIds;
 	}
 
 	public function tabsForDisplay($eventid, $wodid) {
@@ -469,23 +565,63 @@ class EventDetailController extends Controller {
 
 		$leaderboard = [];
 		$sql = 'SELECT
-			CONCAT(ath.Name, " ", ath.Surname) as fullname,
-			sc.athlete_id,
-			sc.wod_id,
-			athev.event_id,
-			sc.score,
-			athev.gender, 
-			athev.athletetype
-		FROM scores as sc
-		inner join athletes as ath on ath.id = sc.athlete_id
-		INNER JOIN athlete_events AS athev ON athev.athlete_id = sc.athlete_id
-		WHERE athev.event_id = ? AND sc.wod_id = ? AND athev.athletetype = ? AND athev.gender = ? 
-		ORDER BY sc.score DESC';
+			@i:=@i+1 AS position, 
+			cast(sc.score as int) as score, 
+			CONCAT(ath.Name, " ", ath.Surname) as AthleteName,
+			sc.athlete_id
+		FROM scores AS sc 
+		INNER JOIN athlete_events ae on ae.athlete_id = sc.athlete_id 
+		INNER JOIN (SELECT @i:=0) foo 
+		INNER JOIN athletes ath on ath.id = ae.athlete_id 
+		WHERE sc.wod_id = ? AND ae.gender = ? AND ae.athletetype = ?
+		ORDER BY score DESC';
 
-		$prepvars = [(int)$data['eventid'], (int)$data['wodid'], (int)$data['athletetype'], (int)$data['gender']];
+		// WHERE ae.event_id ? AND sc.wod_id = ? AND ae.gender = ? AND ae.athletetype = ?
+		// $prepvars = [(int)$data['eventid'], (int)$data['wodid'], (int)$data['gender'], (int)$data['athletetype']];
+		$prepvars = [(int)$data['wodid'], (int)$data['gender'], (int)$data['athletetype']];
 		$leaderboard = DB::select($sql, $prepvars);
 
+		if ( !empty($leaderboard) ) {
+			$this->saveLeaderBoard($leaderboard, $data);
+		}
+
 		return $leaderboard;
+
+	}
+
+	public function getOverallStandings(Request $request) {
+
+		$data = [
+			'eventid'		=> $request->input('eventid'),
+			'gender'		=> $request->input('gender'),
+			'athletetype'	=> $request->input('athletetype')
+		];
+
+		// var_dump($data);
+
+		return response()->json($this->overallStanding ($data));
+	}
+
+	public function overallStanding ($data) {
+
+		$standing = [];
+
+		$sql = 'SELECT 
+				@i:=@i+1 AS position,
+				lb.athlete_id,
+				lb.athletename, 
+				SUM(lb.points) as totalscore
+			FROM leaderboards AS lb
+			INNER JOIN athlete_events as ae ON ae.athlete_id = lb.athlete_id
+			INNER JOIN (SELECT @i:=0) foo 
+			WHERE lb.event_id = ? AND ae.gender = ? AND ae.athletetype = ?
+			GROUP BY lb.athlete_id, lb.athletename
+			ORDER BY totalscore';
+		$prepvars = [(int)$data['eventid'], (int)$data['gender'], (int)$data['athletetype']];
+
+		$standing = DB::select($sql, $prepvars);
+
+		return $standing;
 
 	}
 
@@ -493,26 +629,55 @@ class EventDetailController extends Controller {
 
 		$leaderboard = [];
 
-		$sql = 'SELECT
-			CONCAT(ath.Name, " ", ath.Surname) as fullname,
-			sc.athlete_id,
-			sc.wod_id,
-			athev.event_id,
-			sc.score,
-			athev.gender, 
-			athev.athletetype
-		FROM scores as sc
-		inner join athletes as ath on ath.id = sc.athlete_id
-		INNER JOIN athlete_events AS athev ON athev.athlete_id = sc.athlete_id
-		WHERE athev.event_id = ? AND sc.wod_id = ? AND athev.athletetype = ? AND athev.gender = ?
-		ORDER BY sc.score ASC';
+		$sql = 'SELECT 
+				@i:=@i+1 AS position, 
+				sc.score, 
+				CONCAT(ath.Name, " ", ath.Surname) as AthleteName,
+				sc.athlete_id
+			FROM scores AS sc 
+			INNER JOIN athlete_events ae on ae.athlete_id = sc.athlete_id 
+			INNER JOIN (SELECT @i:=0) foo 
+			INNER JOIN athletes ath on ath.id = ae.athlete_id 
+			WHERE sc.wod_id = ? AND ae.gender = ? AND ae.athletetype = ? 
+			ORDER BY sc.score ASC';
 
-		$prepvars = [(int)$data['eventid'], (int)$data['wodid'], (int)$data['athletetype'], (int)$data['gender']];
 
+		// WHERE ae.event_id = ? AND sc.wod_id = ? AND ae.gender = ? AND ae.athletetype = ? 
+		// $prepvars = [(int)$data['eventid'], (int)$data['wodid'], (int)$data['gender'], (int)$data['athletetype']];
+		$prepvars = [(int)$data['wodid'], (int)$data['gender'], (int)$data['athletetype']];
 		$leaderboard = DB::select($sql, $prepvars);
+
+		if ( !empty($leaderboard) ) {
+
+			$this->saveLeaderBoard($leaderboard, $data);
+
+		}
 
 		return $leaderboard;
 
+	}
+
+	public function saveLeaderBoard($leaderboard, $data) {
+
+		foreach ( $leaderboard as $leaderboardAthlete ) {
+
+			$leaderboardEntry = new Leaderboard();
+			$leaderboardEntry->points		= ( is_null($leaderboardAthlete->score) ) ? 0: (int)$leaderboardAthlete->position;
+			$leaderboardEntry->athletename	= $leaderboardAthlete->AthleteName;
+			$leaderboardEntry->athlete_id	= $leaderboardAthlete->athlete_id;
+			$leaderboardEntry->wod_id		= (int)$data['wodid'];
+			$leaderboardEntry->event_id		= (int)$data['eventid'];
+			$leaderboardEntry->score		= ( is_null($leaderboardAthlete->score) ) ? 0: (int)$leaderboardAthlete->score;
+			$leaderboardEntry->save();
+
+		}
+
+		return 0;
+
+	}
+
+	public function clearEventLeaderBoard($eventid) {
+		return Leaderboard::where('event_id', $eventid)->delete();
 	}
 
 

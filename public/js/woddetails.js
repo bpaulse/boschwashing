@@ -2,17 +2,14 @@ $(document).ready(function(){
 
 	toastr.options.preventDuplicates = false;
 
-	// var eventid = window.location.href.split('/').pop();
 	var chunks = window.location.href.split('/');
 
-	// console.log(chunks.length);
 	var wodid = chunks[chunks.length-1];
 	var eventid = chunks[chunks.length-2];
 
 	loadAthletes(eventid, wodid);
 
 	$(document).on('click', '.backEventDetails', function(evt){
-		// console.log('backeventdetails');
 		window.location.href = '/displayEventDetails/' + eventid;
 	});
 
@@ -30,6 +27,12 @@ $(document).ready(function(){
 
 		evt.preventDefault();
 
+		let athlete_id = $('#athlete_id').val();
+		let wod_id = $('#wod_id').val();
+
+		console.log('addscoreform');
+
+
 		if ( $('#submittype').val() === 'roundsfortime') {
 
 			let secondes = $('#secondes').val();
@@ -41,9 +44,6 @@ $(document).ready(function(){
 				
 
 				let stringToSave = minutes + ':' + secondes;
-
-				let athlete_id = $('#athlete_id').val();
-				let wod_id = $('#wod_id').val();
 
 				ajaxData = {
 					athlete_id: athlete_id,
@@ -79,16 +79,58 @@ $(document).ready(function(){
 					success: function(response) {
 
 						$('#wodScoreModal').modal('hide');
+
+						console.log(response.data.score);
+						console.log(response.data.athlete_id);
+
 						$("#" + response.data.athlete_id + " th:nth-child(5)").text(response.data.score);
+						var img = '<img src="/images/entered.png" style="width: 30px;" />';
+						$("#" + response.data.athlete_id + " th:nth-child(4)").html(img);
 
 					}
 
 				});
 			}
+		} else {
+			
+			console.log('submit');
+			console.log($('#submittype').val());
+			console.log($('#wodvalue').val());
+
+			var ajaxData = {
+				wodvalue: $('#wodvalue').val(),
+				submittype: $('#submittype').val(),
+				athleteid: athlete_id,
+				wodid: wod_id 
+			};
+
+			console.log(ajaxData);
+
+			$.ajax({
+				type: 'GET',
+				url: '/saveValueScoring',
+				data: ajaxData,
+				dataType: 'json',
+				contentType: false,
+				success: function(response) {
+
+					console.log('saveValueScoring');
+					console.log(response);
+
+					console.log(response.data.score);
+
+					$('#wodScoreModal').modal('hide');
+					$("#" + response.data.athlete_id + " th:nth-child(5)").text(response.data.score);
+					var img = '<img src="/images/entered.png" style="width: 30px;" />';
+					$("#" + response.data.athlete_id + " th:nth-child(4)").html(img);
+
+				}
+			});
+
 		}
+
 	});
 
-	//  #minutes
 	$(document).on('keyup', '#secondes', function(evt){
 
 		$('#addscoreform').prop('disabled', false);
@@ -199,8 +241,11 @@ function populateScoringInputForm (athlete_id, wod_id, event_id) {
 			$('#athlete_id').val(athlete_id);
 
 			if ( athleteInfo.wodtype == 1 ) {
+
 				console.log('X');
 				$('#scoringtype').html( Reps() );
+				$('#wodvalue').val(scoreString);
+
 			} else if ( athleteInfo.wodtype == 2 ) {
 
 				$('#scoringtype').html( roundsfortime() );
@@ -233,6 +278,9 @@ function populateScoringInputForm (athlete_id, wod_id, event_id) {
 			} else if ( athleteInfo.wodtype == 3 ) {
 				console.log('Z');
 				$('#scoringtype').html( onerm() );
+
+				$('#wodvalue').val(scoreString);
+
 			}
 
 		}
@@ -266,8 +314,8 @@ function Reps() {
 
 	output = output + '<div class="form-row">';
 	output = output + '<div class="form-group col-md-4">';
-	output = output + '<label for="Reps">Reps</label>';
-	output = output + '<input type="text" class="form-control" id="Reps">';
+	output = output + '<label for="wodvalue">Reps</label>';
+	output = output + '<input type="text" class="form-control" id="wodvalue">';
 	output = output + '<input type="hidden" class="form-control" id="submittype" value="reps">';
 	output = output + '</div>';
 	output = output + '</div>';
@@ -277,13 +325,13 @@ function Reps() {
 function onerm() {
 	let output = '';
 
-	output = output + '<div class="form-row">';
-	output = output + '<div class="form-group col-md-4">';
-	output = output + '<label for="onerepmax">1RM</label>';
-	output = output + '<input type="text" class="form-control" id="onerepmax">';
-	output = output + '<input type="hidden" class="form-control" id="submittype" value="onerm">';
-	output = output + '</div>';
-	output = output + '</div>';
+	output += '<div class="form-row">';
+	output += '<div class="form-group col-md-4">';
+	output += '<label for="wodvalue">1RM</label>';
+	output += '<input type="text" class="form-control" id="wodvalue">';
+	output += '<input type="hidden" class="form-control" id="submittype" value="onerm">';
+	output += '</div>';
+	output += '</div>';
 	return output;
 }
 

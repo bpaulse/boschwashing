@@ -8,14 +8,14 @@
 				</button>
 			</div>
 
-			<div class="displayoptions" style="margin: auto; border: 1pt solid black;">
+			<!-- <div class="displayoptions" style="margin: auto; border: 1pt solid black;">
 				<label class="label_radio" for="sample-radio">
 					<input name="sample-radio" value="New User" type="radio" />New User
 				</label>
 				<label class="label_radio" for="sample-radio">
 					<input name="sample-radio" value="Existing User" type="radio" />Existing User
 				</label>
-			</div>
+			</div> -->
 
 			<div>
 				<form action="{{ route('add.athlete') }}" method="POST" id="add-athlete-form">

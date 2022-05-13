@@ -1,6 +1,3 @@
-<?php
-echo $eventid;
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,6 +48,7 @@ echo $eventid;
 
 	@include('add-athlete-modal');
 	@include('add-wod-modal');
+	@include('edit-wod-modal');
 
 	<script src="{{ asset('jquery/jquery-3.6.0.min.js') }}"></script>
 	<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
@@ -58,6 +56,7 @@ echo $eventid;
 	<script src="{{ asset('datatable/js/dataTables.bootstrap4.min.js') }}"></script>
 	<script src="{{ asset('sweetalert2/sweetalert2.min.js') }}"></script>
 	<script src="{{ asset('toastr/toastr.min.js') }}"></script>
+	<script src="{{ asset('js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
 
 	<script type="text/javascript" src="{{ asset('js/eventDetail.js') }}"></script>
 

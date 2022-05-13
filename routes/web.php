@@ -33,9 +33,13 @@ Route::get('/printpdf', [InvoiceController::class, 'printPDF'])->name('print.pdf
 
 // Events
 Route::get('/events', [EventController::class, 'eventslist']);
-Route::post('/add-event', [EventController::class, 'addEvent'])->name('add.event');
+Route::get('/addEvent', [EventController::class, 'addEvent']);
 Route::get('/getEventsList', [EventController::class, 'getEventsList'])->name('get.events.list');
 
+Route::get('/changeEventStatus', [EventController::class, 'changeEventStatus']);
+
+Route::get('/getEventDetails', [EventController::class, 'getEventDetails']);
+Route::get('/updateEventData', [EventController::class, 'updateEventData']);
 
 Route::get('/displayEventDetails/{id}', [EventController::class, 'displayEventDetails']);
 Route::get('/getWodsForEvent', [EventDetailController::class, 'getWodsForEvent']);
@@ -46,11 +50,16 @@ Route::get('/getGender', [EventController::class, 'getGender']);
 Route::get('/getEventName', [EventController::class, 'getEventName']);
 
 Route::post('/add-wod', [EventDetailController::class, 'addWod'])->name('add.wod');
+Route::post('/edit-wod', [EventDetailController::class, 'editWod'])->name('edit.wod');
 Route::post('/add-score', [EventDetailController::class, 'addScore'])->name('add.score');
 Route::post('/add-athlete', [EventDetailController::class, 'addAthlete'])->name('add.athlete');
 Route::post('/add-client', [ClientController::class, 'addClient'])->name('add.client');
 
 Route::get('/getWODDesc', [EventDetailController::class, 'getWODDesc']);
+Route::get('/getWODDescAndSettings', [EventDetailController::class, 'getWODDescAndSettings']);
+
+Route::get('/updateWod', [EventDetailController::class, 'updateWod']);
+
 Route::get('/wodDetails/{id}/{wodid}', [EventDetailController::class, 'wodDetails']);
 Route::get('/wodResults/{id}/{wodid}', [EventDetailController::class, 'wodResults']);
 Route::get('/getAthletesForEvent', [EventDetailController::class, 'getAthletesForEvent']);
@@ -61,6 +70,9 @@ Route::get('/saveInputScoring', [EventDetailController::class, 'saveInputScoring
 
 Route::get('/getAllDivisions', [EventDetailController::class, 'getAllDivisions']);
 Route::get('/getLeaderBoardData', [EventDetailController::class, 'getLeaderBoardData']);
+
+Route::get('/getOverallStandings', [EventDetailController::class, 'getOverallStandings']);
+Route::get('/saveValueScoring', [EventDetailController::class, 'saveValueScoring']);
 
 // User Management
 // Route::get('dashboard', [CustomAuthController::class, 'dashboard']); 

@@ -1,3 +1,5 @@
+// tinymce.init({selector:'textarea', inline: true});
+
 $(document).ready(function(){
 
 	toastr.options.preventDuplicates = false;
@@ -133,7 +135,7 @@ $(document).ready(function(){
 				event_id:			$('#event_id').val(),
 			};
 
-			// console.log(ajaxData);
+			console.log(ajaxData);
 
 			$.ajax({
 				type: $(form).attr('method'),
@@ -153,19 +155,17 @@ $(document).ready(function(){
 						// });
 					} else {
 
-						console.log('success');
+						// console.log('success');
 						$('#addAthleteModal').modal('hide');
 
 						$(form)[0].reset();
 						toastr.success(response.msg);
 
-						console.log(response.data);
+						// console.log(response.data);
 
-						var athlete = response.data;
-						console.log(athlete);
+						// var athlete = response.data;
+						// console.log(athlete);
 
-						// var row = eventRow({'id': event.id, 'event_name': event.name, 'event_desc': event.desc, 'event_loc': event.loc});
-						// $('#eventsData').append(row);
 					}
 
 				},
@@ -180,15 +180,123 @@ $(document).ready(function(){
 	});
 
 	$(document).on('click', '.wodDetails', function(evt) {
+
 		console.log('wodDetails');
 		var wodid = $(this).closest('tr').attr("data-wod_id");
 		window.location.href = '/wodDetails/' + eventid + '/' + wodid;
+
 	});
+
+	$(document).on('click', '.editWod', function(evt){
+
+		$('#editEventModal').modal('show');
+		let wodid = $(this).closest('tr').attr('data-wod_id');
+
+		$('#wod_id').val(wodid);
+
+		let wodData = {
+			wodid: wodid
+		};
+
+		getWODDetails(wodData);
+
+	});
+
+	$(document).on('click', '.updateWod', updateEventWod);
 
 });
 
+function updateEventWod(evt){
+
+	console.log('updateWod');
+
+	evt.preventDefault();
+
+	// wod_edit_name
+	var ajaxData = {
+		wod_id: $("#wod_id").val(),
+		wod_name: $("#wod_edit_name").val(),
+		wod_desc: $.trim($("#wod_edit_desc").val()),
+		wod_type: $("#wod_edit_type option:selected").val(),
+		wod_type_name: $("#wod_edit_type option:selected").text()
+	};
+
+	updateAjaxWod(ajaxData);
+
+}
+
+function updateAjaxWod(data) {
+
+	$.ajax({
+		type: 'GET',
+		url: '/updateWod',
+		data: data,
+		dataType: 'json',
+		contentType: false,
+		success: function (response) {
+
+			if ( response.update == 1 ) {
+
+				toastr.success('WOD updated successfully...');
+				$('#editEventModal').modal('hide');
+
+				$('tr[data-wod_id="' + response.wod_id + '"] th:nth-child(1)').html(response.wodData.wodname);
+				$('tr[data-wod_id="' + response.wod_id + '"] th:nth-child(2)').html(response.wodData.woddesc);
+				$('tr[data-wod_id="' + response.wod_id + '"] th:nth-child(3)').text(response.wodData.wodtypename);
+
+
+			} else {
+				toastr.warning('ERROR updating the WOD. Please try again...');
+			}
+
+		},
+		error: function(e) {
+			console.log(e);
+		}
+	});
+
+}
+
+function getWODDetails (wodData) {
+
+	$.ajax({
+		type: 'GET',
+		url: '/getWODDescAndSettings',
+		data: wodData,
+		dataType: 'json',
+		contentType: false,
+		success: function (response) {
+
+			let wod = response.wod;
+
+			$('#wod_edit_name').val(wod.wodname);
+			$('#wod_edit_desc').val(wod.woddesc);
+
+			let settings = response.settings;
+
+			var ddl = $("#wod_edit_type");
+			ddl.empty();
+			ddl.append($("<option></option>").val("").html("--Select--"));
+
+			$.each(settings, function (index, item) {
+
+				if ( wod.wodtype == item.id ) {
+					ddl.append($("<option selected></option>").val(item.id).html(item.settingdesc));
+				} else {
+					ddl.append($("<option></option>").val(item.id).html(item.settingdesc));
+				}
+
+			});
+
+		},
+		error: function(e) {
+			console.log(e);
+		}
+	});
+
+}
+
 function backToEvents () {
-	console.log('back button');
 	window.location.href = '/events';
 }
 
@@ -231,12 +339,11 @@ function loadWods(eventid) {
 		contentType: false,
 		success: function (response) {
 
-			console.log(response);
+			// console.log(response);
 
 			var output = '';
 
 			if ( response.count === 0 ) {
-				// console.log('count zero');
 				output = wodRowNoData();
 			} else {
 				$.each(response.data, function(data1,data2){
@@ -275,7 +382,7 @@ function deleteButton() {
 }
 
 function editButton () {
-	return '<button class="btn btn-info editInvoice"><i class="icon-pencil"></i></button>' + '&nbsp;' + '&nbsp;' + scoreBoardButton();
+	return '<button class="btn btn-info editWod"><i class="icon-pencil"></i></button>' + '&nbsp;' + '&nbsp;' + scoreBoardButton();
 }
 
 function scoreBoardButton() {
@@ -323,8 +430,7 @@ function delete_search_history(id) {
 	});
 }
 
-function load_search_history()
-{
+function load_search_history(){
 	var search_query = document.getElementsByName('search_box')[0].value;
 
 	if(search_query == '')
@@ -373,8 +479,7 @@ function load_search_history()
 	}
 }
 
-function get_text(event)
-{
+function get_text(event) {
 	var string = event.textContent;
 
 	//fetch api
@@ -451,13 +556,3 @@ function load_data(query)
 		document.getElementById('search_result').innerHTML = '';
 	}
 }
-
-/*var ignore_element = document.getElementById('search_box');
-
-document.addEventListener('click', function(event) {
-    var check_click = ignore_element.contains(event.target);
-    if (!check_click) 
-    {
-        document.getElementById('search_result').innerHTML = '';
-    }
-});*/

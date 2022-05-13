@@ -47,6 +47,5 @@
 		</div>
 	</div>
 
-	@include('edit-invoice-modal');
-	<script type="text/javascript" src="{{ asset('js/index.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/events.js') }}"></script>
 @endsection

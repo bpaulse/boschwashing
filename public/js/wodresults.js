@@ -1,7 +1,5 @@
 $(document).ready(function(){
 
-	console.log('leaderboards');
-
 	toastr.options.preventDuplicates = false;
 
 	var chunks = window.location.href.split('/');
@@ -23,7 +21,24 @@ function populateUL(eventid, wodid) {
 
 }
 
+function BuildInitialTabs (data) {
+	var counter = 0;
+	$.each(data, function(data1,gender){
+		for (let i = 0; i < gender.length; i++) {
+			if ( counter == 0 ){
+				$(".nav-tabs").append(tabHTML('active', gender[i]));
+				$(".tab-content").append(contentHTML('in active', gender[i]));
+			} else {
+				$(".nav-tabs").append(tabHTML('', gender[i]));
+				$(".tab-content").append(contentHTML('', gender[i]));
+			}
+			counter++;
+		}
+	});
+}
+
 function getDivision(eventid, wodid) {
+
 	$.ajax({
 		type: 'GET',
 		url: '/getAllDivisions',
@@ -32,121 +47,85 @@ function getDivision(eventid, wodid) {
 		contentType: false,
 		success: function (response) {
 
-			// console.log(response);
-
 			let eventData = response.eventData;
-
-			console.log('eventData');
-			console.log(eventData.data[5][0]);
-
-			$.each(eventData.data, function(data1,gender){
-				for (let i = 0; i < gender.length; i++) {
-
-					if ( data1 == 0 ){
-						$(".nav-tabs").append(tabHTML('active', gender[i]));
-						$(".tab-content").append(contentHTML('in active', gender[i]));
-					} else {
-						$(".nav-tabs").append(tabHTML('', gender[i]));
-						$(".tab-content").append(contentHTML('', gender[i]));
-					}
-				}
-			});
-
-
-			$.each(response.leaderboard, function(data1,mann){
-
-				console.log(mann);
-
-				// var elementId;
-
-				var divId = '';
-
-				$.each(mann, function(index,wodloaderboard){
-
-					// divId = eventData.data[]
-
-
-					console.log(index);
-					var board = wodloaderboard[4][0];
-					console.log('board');
-					console.log(board);
-
-					console.log('athletetype');
-					console.log(board[0].athletetype);
-
-					var num = 1;
-					var rows;
-					for ( var j = 0; j < board.length; j++ ){
-						rows += '<tr><td>'+num+'</td><td>'+board[j].fullname+'</td><td>'+board[j].score+'</td></tr>';
-						num = Number(num) + 1;
-					}
-
-					console.log(eventData.data[board[0].athletetype][0].id);
-
-				});
-
-				// var elementId = eventData.data[category][0].id;
-				// console.log('elementId');
-				// console.log(elementId);
-
-				// var category = Object.keys(mann)[0];
-				// $.each(mann, function(data1,leaderboard){
-
-				// 	currLeaderboard = leaderboard[0];
-
-				// 	let rows = '';
-				// 	let num = 0;
-
-				// 	for (let i = 0; i < currLeaderboard.length; i++) {
-
-				// 		num = Number(i) + 1;
-				// 		rows += '<tr><td>'+num+'</td><td>'+currLeaderboard[i].fullname+'</td><td>'+currLeaderboard[i].score+'</td></tr>';
-				// 	}
-
-				// 	let divId = eventData.data[category][0].id;
-
-				// 	$("#"+divId).append(createTable(rows));
-				// });
-
-			});
-
+			BuildInitialTabs(eventData.data);
+			buildLeaderBoards(response);
 
 		},
 		error: function(e) {
 			console.log(e);
 		}
 	});
+
 }
 
-function buildTabs (index, data, details) {
+function buildLeaderBoards(response) {
 
+	var data = response.leaderboard;
+	var wods = data[response.eventData.static.eventid];
 
-	if ( index == 'First') {
+	console.log(response.eventData)
 
-		$(".nav-tabs").append(tabHTML('active', data));
-		$(".tab-content").append(contentHTML('in active', data));
+	var divId;
 
-		// $("#"+data.id).append(createTable(data));
-		tableContent(details, data.id);
+	$.each(wods, function(wodid,wod){
+		$.each(wod, function(gender,athletetypeArray){
+			$.each(athletetypeArray, function(athletetype, participants){
+				let row = '';
+				for ( var j = 0; j < participants.length; j++ ) {
+					row += singleRow(Number(j) + 1, participants[j]);
+				}
+				divId = response.eventData.data[athletetype][0].id;
+				$('#' + divId).append(createTable(row));
 
-	} else {
+			});
+		});
+	});
 
-		// $(".nav-tabs").append(tabHTML('', data));
-		// $(".tab-content").append(contentHTML('', data));
+	addOverallLeaderBoard(1, 13, 5, 'TeamsIntermediate');
+	addOverallLeaderBoard(1, 13, 4, 'TeamsRX');
 
-		// $("#"+data.id).append(createTable(data));
-		// console.log(data.id);
+}
 
-	}
+function addOverallLeaderBoard (eventid, gender, athletetype, divId) {
 
+	var ajaxData = {
+		eventid: eventid,
+		gender: gender, 
+		athletetype: athletetype, 
+		divId: divId
+	};
 
-	// populateLeaderboard(data.wodid);
+	$.ajax({
+		type: 'GET',
+		url: '/getOverallStandings',
+		data: ajaxData,
+		dataType: 'json',
+		success: function (response) {
 
-	// $('.tab-content').append(createTableHeader(data));
-	//populate table
-	// $('.tab-content').append();
+			var rows = '';
 
-	return 0;
+			$.each(response, function(index,data){
+				rows += singleRowOverall(index, data);
+			});
+
+			$('#' + divId).append(createTable(rows));
+
+		},
+		error: function(e) {
+			console.log(e);
+		}
+	});
+
+}
+
+function singleRow(index, board) {
+	return '<tr><td>'+index+'</td><td>'+board.AthleteName+'</td><td>'+board.score+'</td></tr>';
+}
+
+function singleRowOverall(index, board) {
+	var num = Number(index)+1;
+	return '<tr><td>'+num+'</td><td>'+board.athletename+'</td><td>'+board.totalscore+'</td></tr>';
 }
 
 function tabHTML(classStr, data){

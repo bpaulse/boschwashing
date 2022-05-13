@@ -11,15 +11,20 @@
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css">
+	<!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css"> -->
 	<title>Events List</title>
 </head>
 <body>
 
 	<div class="container">
 		<div class="row" style="margin-top: 45px">
-			<div class="col-md-8">
+			<div class="col-md-12">
 				<div class="card">
-					<div class="card-header"><i class="icon-list"></i> Event(s)</div>
+					<div class="card-header">
+						<i class="icon-list"></i> Event(s)
+						<i class="icon-plus float-right" id="addEventForm"></i>
+					</div>
 					<div class="card-body">
 						<table class="table table-hover table-condensed" id="invoices-table">
 							<thead>
@@ -34,45 +39,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">
-				<div class="card">
-					<div class="card-header">
-						<i class="icon-plus-sign-alt"></i> Add New Event
-					</div>
-					<div class="card-body">
-						<form action="{{ route('add.event') }}" method="POST" id="add-event-form">
-							@csrf
-							<div class="form-group">
-								<label for="">Event Name</label>
-								<input type="text" class="form-control" name="event_name" placeholder="Please Enter an Event Name..." />
-								<span class="text-danger error-text event_name_error"></span>
-							</div>
-							<div class="form-group">
-								<label for="">Event Desciption</label>	
-								<input type="text" class="form-control" name="event_desc" placeholder="Please enter an Event Description..." />
-								<span class="text-danger error-text event_desc_error"></span>
-							</div>
-							<div class="form-group">
-								<label for="">Event Location</label>	
-								<input type="text" class="form-control" name="event_location" placeholder="Please enter an Event Location..." />
-								<span class="text-danger error-text event_location_error"></span>
-							</div>
-							<div class="form-group">
-								<label for="">Event Date</label>	
-								<input type="text" class="form-control" name="event_date" id="event_date" placeholder="Please enter an Event Date..." />
-								<span class="text-danger error-text event_date_error"></span>
-							</div>
-							<div class="form-group">
-								<button class="btn btn-block btn-success" type="submit">SAVE</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 
-	{{-- @include('edit-invoice-modal'); --}}
+	@include('edit-event-modal');
+	@include('add-event-modal');
 
 	<script src="{{ asset('jquery/jquery-3.6.0.min.js') }}"></script>
 	<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
@@ -80,6 +51,7 @@
 	<script src="{{ asset('datatable/js/dataTables.bootstrap4.min.js') }}"></script>
 	<script src="{{ asset('sweetalert2/sweetalert2.min.js') }}"></script>
 	<script src="{{ asset('toastr/toastr.min.js') }}"></script>
+	<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
 	<script type="text/javascript" src="{{ asset('js/events.js') }}"></script>
 
