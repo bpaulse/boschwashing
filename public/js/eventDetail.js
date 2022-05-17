@@ -339,15 +339,13 @@ function loadWods(eventid) {
 		contentType: false,
 		success: function (response) {
 
-			// console.log(response);
-
 			var output = '';
 
 			if ( response.count === 0 ) {
 				output = wodRowNoData();
 			} else {
 				$.each(response.data, function(data1,data2){
-					var row = wodRow({'id': data2.id, 'wodname': data2.wodname, 'woddesc': data2.woddesc, 'wodtype': data2.wodtype, 'settingdesc': data2.settingdesc});
+					var row = wodRow({'id': data2.id, 'wodname': data2.wodname, 'woddesc': data2.woddesc, 'wodtype': data2.wodtype, 'settingdesc': data2.settingdesc, 'event_date': data2.event_date });
 					output += row;
 				});
 			}
@@ -362,15 +360,27 @@ function loadWods(eventid) {
 }
 
 function wodRow (wod, type) {
-	return '<tr data-wod_id="'+ wod.id +'"><th>' + wod.wodname + '</th><th>' + wod.woddesc + '</th><th>' + wod.settingdesc  + '</th><th>' + editAndSaveButtons() + '</th></tr>';
+	console.log(wod.event_date);
+	return '<tr data-wod_id="'+ wod.id +'"><th>' + wod.wodname + '</th><th>' + wod.woddesc + '</th><th>' + wod.settingdesc  + '</th><th>' + editAndSaveButtons(wod.event_date) + '</th></tr>';
 }
 
 function wodRowNoData() {
 	return '<tr id="nodata"><th colspan="4" style="text-align: center; color: blue;">No WODS loaded...</th></tr>';
 }
 
-function editAndSaveButtons() {
-	return editButton () + '&nbsp;' + '&nbsp;' + clickThroughButton();
+function editAndSaveButtons(event_date) {
+
+	console.log(event_date);
+
+	const eventDateObj = new Date(event_date);
+	const currentDateObj = new Date();
+
+	if ( eventDateObj < currentDateObj ) {
+		return scoreBoardButton();
+	} else {
+		return editButton () + '&nbsp;' + '&nbsp;' + scoreBoardButton() + '&nbsp;' + '&nbsp;' + clickThroughButton();
+	}
+
 }
 
 function clickThroughButton () {
@@ -382,7 +392,7 @@ function deleteButton() {
 }
 
 function editButton () {
-	return '<button class="btn btn-info editWod"><i class="icon-pencil"></i></button>' + '&nbsp;' + '&nbsp;' + scoreBoardButton();
+	return '<button class="btn btn-info editWod"><i class="icon-pencil"></i></button>';
 }
 
 function scoreBoardButton() {

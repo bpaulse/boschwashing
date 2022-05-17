@@ -15,8 +15,9 @@ class EventDetailController extends Controller {
 
 	public function getWodsForEvent (Request $request) {
 
-		$wods = DB::table('wods')->select('wods.id', 'wods.wodname', 'wods.woddesc', 'wods.event_id', 'wods.wodtype', 'settings.settingdesc')
+		$wods = DB::table('wods')->select('wods.id', 'wods.wodname', 'wods.woddesc', 'wods.event_id', 'wods.wodtype', 'settings.settingdesc', 'events.event_date')
 		->join('settings', 'settings.id', '=', 'wods.wodtype')
+		->join('events', 'events.id', '=', 'wods.event_id')
 		->where('event_id', $request->eventid)
 		->get();
 
@@ -408,7 +409,6 @@ class EventDetailController extends Controller {
 		$settings = Setting::all();
 		$output = [];
 		foreach ( $settings as $setting ){
-
 			$output[$setting->id] = $setting->settingdesc;
 		}
 		return $output;

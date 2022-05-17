@@ -273,7 +273,7 @@ function loadEvents() {
 		success: function(response){
 			var output = '';
 			$.each(response.details, function(data1,data2){
-				var row = eventRow({'id': data2.id, 'event_name': data2.event_name, 'event_desc': data2.event_desc, 'event_loc': data2.event_location});
+				var row = eventRow({'id': data2.id, 'event_name': data2.event_name, 'event_desc': data2.event_desc, 'event_loc': data2.event_location, 'event_date': data2.event_date});
 				output += row;
 			});
 			$('#eventsData').html(output);
@@ -318,11 +318,24 @@ function populateEventEditForm(eventid){
 }
 
 function eventRow (event) {
-	return '<tr data-id="'+ event.id +'"><th>' + event.event_name + '</th><th>' + event.event_desc + '</th><th>' + event.event_loc  + '</th><th>' + editAndSaveButtons() + '</th></tr>';
+	return '<tr data-id="'+ event.id +'"><th>' + event.event_name + '</th><th>' + event.event_desc + '</th><th>' + event.event_loc  + '</th><th>' + editAndSaveButtons(event.event_date) + '</th></tr>';
 }
 
-function editAndSaveButtons() {
-	return '<button class="btn btn-info" id="editEvent"><i class="icon-pencil"></i></button>' + '&nbsp;' + '<button class="btn btn-danger deleteEvent">' + '<i class="icon-trash"></i>' + '</button>' + '&nbsp;' + '<button class="btn btn-success eventDetail">' + '<i class="icon-chevron-right"></i>' + '</button>';
+function editAndSaveButtons(event_date) {
+
+	const eventDateObj = new Date(event_date);
+	const currentDateObj = new Date();
+
+	var output = '';
+
+	if ( eventDateObj < currentDateObj ) {
+		output = '<button class="btn btn-success eventDetail">' + '<i class="icon-chevron-right"></i>' + '</button>';
+	} else {
+		output = '<button class="btn btn-info" id="editEvent"><i class="icon-pencil"></i></button>' + '&nbsp;' + '<button class="btn btn-danger deleteEvent">' + '<i class="icon-trash"></i>' + '</button>' + '&nbsp;' + '<button class="btn btn-success eventDetail">' + '<i class="icon-chevron-right"></i>' + '</button>';
+	}
+
+	return output;
+
 }
 
 function myFunc(e){

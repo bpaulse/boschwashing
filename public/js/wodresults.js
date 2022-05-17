@@ -147,9 +147,9 @@ function createTable (tablecontent, type) {
 		overall = 'background-color: grey; color: white;';
 		borderline = '0px';
 	}
-	return '<div style="float: left; padding: 10px; border-right: '+borderline+' solid black;"><h5>Wod Name</h5><table style="border: 0px solid black; width: 130px; font-size: 10pt; ' + overall +'">'+TableHeader()+tablecontent+'</table></div>';
+	return '<div style="float: left; padding: 10px; border-right: '+borderline+' solid black;"><h5>Wod Name</h5><table border="1" style="width: 140px; font-size: 8pt; ' + overall +'">'+TableHeader()+tablecontent+'</table></div>';
 }
 
 function TableHeader () {
-	return '<tr><td style="width: 8%;">#</td><td>Name</td><td>Score</td></tr>';
+	return '<tr><td style="width: 8%;">#</td><td style="width: 80%;">Name</td><td style="width: 12%;">Score</td></tr>';
 }
