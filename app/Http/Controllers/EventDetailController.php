@@ -364,6 +364,9 @@ class EventDetailController extends Controller {
 
 	public function wodResults ($id) {
 
+		// var_dump('event id');
+		// var_dump($id);
+
 		// $tabs = DB::select('SELECT 
 		// 		settings.id, 
 		// 		settings.settingdesc 
@@ -382,8 +385,8 @@ class EventDetailController extends Controller {
 				* 
 			FROM 
 				athlete_events
-			WHERE event_id = 1', 
-			[]
+			WHERE event_id = ?', 
+			[$id]
 		);
 
 		$data = ['tabs' => $tabs];
@@ -401,14 +404,40 @@ class EventDetailController extends Controller {
 
 	}
 
+	public function settings () {
+		$settings = Setting::all();
+		$output = [];
+		foreach ( $settings as $setting ){
+
+			$output[$setting->id] = $setting->settingdesc;
+		}
+		return $output;
+	}
+
 	public function getAllDivisions(Request $request) {
 
 		$eventid = $request->input('eventid');
 		$wodid = $request->input('wodid');
 
-		return response()->json($this->allDivisions($eventid, $wodid));
+		$output = [];
+
+		$settings = $this->settings();
+		// var_dump($settings);
+
+		$genderlist = $this->gender($eventid);
+		foreach ( $genderlist as $key => $gender ) {
+			$athleteType = $this->getAthleteTypeIDs ($gender, $eventid);
+			foreach( $athleteType as $item ) {
+				$output[$gender][$item->athletetype] = $settings[$gender] . $settings[$item->athletetype];
+			}
+
+		}
+
+		return response()->json(['allDivisions' => $this->allDivisions($eventid, $wodid), 'overallLeaderBoard' => $output]);
 
 	}
+
+
 
 	private function allDivisions($eventid, $wodid){
 

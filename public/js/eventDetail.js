@@ -511,8 +511,7 @@ function get_text(event) {
 
 }
 
-function load_data(query)
-{
+function load_data(query){
 	if(query.length > 2)
 	{
 		var form_data = new FormData();

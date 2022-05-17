@@ -16,12 +16,11 @@ $(document).ready(function(){
 });
 
 function populateUL(eventid, wodid) {
-
 	getDivision(eventid, wodid);
-
 }
 
 function BuildInitialTabs (data) {
+
 	var counter = 0;
 	$.each(data, function(data1,gender){
 		for (let i = 0; i < gender.length; i++) {
@@ -35,6 +34,7 @@ function BuildInitialTabs (data) {
 			counter++;
 		}
 	});
+
 }
 
 function getDivision(eventid, wodid) {
@@ -47,7 +47,7 @@ function getDivision(eventid, wodid) {
 		contentType: false,
 		success: function (response) {
 
-			let eventData = response.eventData;
+			let eventData = response.allDivisions.eventData;
 			BuildInitialTabs(eventData.data);
 			buildLeaderBoards(response);
 
@@ -61,29 +61,35 @@ function getDivision(eventid, wodid) {
 
 function buildLeaderBoards(response) {
 
-	var data = response.leaderboard;
-	var wods = data[response.eventData.static.eventid];
+	var data = response.allDivisions.leaderboard;
+	var wods = data[response.allDivisions.eventData.static.eventid];
 
-	console.log(response.eventData)
+	var overallData = response.overallLeaderBoard;
+
+	console.log(overallData);
 
 	var divId;
 
 	$.each(wods, function(wodid,wod){
 		$.each(wod, function(gender,athletetypeArray){
 			$.each(athletetypeArray, function(athletetype, participants){
+
 				let row = '';
 				for ( var j = 0; j < participants.length; j++ ) {
 					row += singleRow(Number(j) + 1, participants[j]);
 				}
-				divId = response.eventData.data[athletetype][0].id;
-				$('#' + divId).append(createTable(row));
+				divId = response.allDivisions.eventData.data[athletetype][0].id;
+				$('#' + divId).append(createTable(row, ''));
 
 			});
 		});
 	});
 
-	addOverallLeaderBoard(1, 13, 5, 'TeamsIntermediate');
-	addOverallLeaderBoard(1, 13, 4, 'TeamsRX');
+	$.each(overallData, function(gender, genderData){
+		$.each(genderData, function(athletetype, athletetypeData){
+			addOverallLeaderBoard( response.allDivisions.eventData.static.eventid, gender, athletetype, athletetypeData );
+		});
+	});
 
 }
 
@@ -109,7 +115,7 @@ function addOverallLeaderBoard (eventid, gender, athletetype, divId) {
 				rows += singleRowOverall(index, data);
 			});
 
-			$('#' + divId).append(createTable(rows));
+			$('#' + divId).append(createTable(rows, 'final'));
 
 		},
 		error: function(e) {
@@ -120,12 +126,12 @@ function addOverallLeaderBoard (eventid, gender, athletetype, divId) {
 }
 
 function singleRow(index, board) {
-	return '<tr><td>'+index+'</td><td>'+board.AthleteName+'</td><td>'+board.score+'</td></tr>';
+	return '<tr><td>'+index+'</td><td>'+board.AthleteName+'</td><td style="text-align: right;">'+board.score+'</td></tr>';
 }
 
 function singleRowOverall(index, board) {
 	var num = Number(index)+1;
-	return '<tr><td>'+num+'</td><td>'+board.athletename+'</td><td>'+board.totalscore+'</td></tr>';
+	return '<tr><td>'+num+'</td><td>'+board.athletename+'</td><td style="text-align: right;">'+board.totalscore+'</td></tr>';
 }
 
 function tabHTML(classStr, data){
@@ -138,12 +144,18 @@ function contentHTML(classStr, data){
 	return html;
 }
 
-function createTable (tablecontent) {
-	return '<div style="float: left; padding: 10px;"><table style="border: 1px solid black; width: 120px; font-size: 8pt;">'+TableHeader()+tablecontent+'</table></div>';
+function createTable (tablecontent, type) {
+	let overall = '';
+	let borderline = '1px';
+	if ( type == 'final') {
+		overall = 'background-color: grey; color: white;';
+		borderline = '0px';
+	}
+	return '<div style="float: left; padding: 10px; border-right: '+borderline+' solid black;"><h5>Wod Name</h5><table style="border: 0px solid black; width: 130px; font-size: 10pt; ' + overall +'">'+TableHeader()+tablecontent+'</table></div>';
 }
 
 function TableHeader () {
-	return '<tr><td>#</td><td>Name</td><td>Score</td></tr>';
+	return '<tr><td style="width: 8%;">#</td><td>Name</td><td>Score</td></tr>';
 }
 
 function populateLeaderboard(wodid) {
