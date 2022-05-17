@@ -63,11 +63,7 @@ function buildLeaderBoards(response) {
 
 	var data = response.allDivisions.leaderboard;
 	var wods = data[response.allDivisions.eventData.static.eventid];
-
 	var overallData = response.overallLeaderBoard;
-
-	console.log(overallData);
-
 	var divId;
 
 	$.each(wods, function(wodid,wod){
@@ -156,9 +152,4 @@ function createTable (tablecontent, type) {
 
 function TableHeader () {
 	return '<tr><td style="width: 8%;">#</td><td>Name</td><td>Score</td></tr>';
-}
-
-function populateLeaderboard(wodid) {
-	console.log('--wodid--');
-	console.log(wodid);
 }
