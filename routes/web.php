@@ -12,10 +12,11 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\pdfController;
 use App\Http\Controllers\SendMailController;
 
+Route::get('/', function () { return view('welcome'); });
+
 Route::get('/login', [CustomAuthController::class, 'login']);
 Route::get('/registration', [CustomAuthController::class, 'registration']);
 
-Route::get('/', function () { return view('welcome'); });
 Route::get('/invoice-list', [InvoiceController::class, 'index'])->name('invoice.list');
 Route::post('/add-invoice', [InvoiceController::class, 'addInvoice'])->name('add.invoice');
 Route::get('/getInvoicesList', [InvoiceController::class, 'getInvoicesList'])->name('get.invoices.list');

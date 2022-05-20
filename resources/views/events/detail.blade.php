@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="{{ asset('datatable/css/dataTables.bootstrap4.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('sweetalert2/sweetalert2.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('toastr/toastr.min.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/index.css') }}">
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 	<title>WOD List</title>
 </head>
